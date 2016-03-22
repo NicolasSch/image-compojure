@@ -6,15 +6,16 @@
 
 ;BEISPIEL ANWENDUNG ZUR VERANSCHAULICHUNG DER GRAMMATIK
 
-(def colorDef (color :green))
-(def colorRGB (color [255 255 245 1]))
-(def colorHex (color :#6C7B8B))
-(def font (font :serif))
+(def colorDef (create-color :green))
+(def colorRGB (create-color [255 255 245 1]))
+(def colorHex (create-color :#6C7B8B))
+(def font (create-font :serif))
 
 
 ;1. und 2. Argument optional
 
-(create-image (load-image {:source    "src/test.png"
+(create-image (load-image {:size (resize 600 400)
+                           :source    "src/test.png"
                            :composite :destination})
               {
                :background          (color :green)
@@ -27,7 +28,7 @@
                :rendering           :quality
                :stroke-control      :default
                :text-antialiasing   :on
-               :clipping            shape
+
                }
 
               ;hier angegeben settings werden auf alle folgenden shapes angewendet
@@ -57,17 +58,8 @@
                                    (line 2 2 3 3)
                                    (line 3 3 4 4)])
                     (polygon [[x0 xn] [y0 yn] xNum yNum])
-                    (oval)
-                    (arc)
-                    (polygon)
-                    (poly-line)
-                    (round-rectangle [1 2 5 10])
-                    (oval)
-                    (arc)
-                    (clear-rectangle)
 
-
-                    (string [posx posy] (styled-text
+                    (string [posx posy] (create-styled-text
                                           {:text         ["DiesIstEinTestText" "Der später über mehrer Zeilen angeziegt" "werden soll"]
                                            :font         (. Font/SERIF)
                                            :strikthrouh  "on"
@@ -83,18 +75,12 @@
 
 
 
-;definiert den Anzeigebereich der Leinwand
-(clip shape)
 
-;hit detection
-(hit [x y])
-
-(crop)
-
-(render {:as   :file
+(render-output {:as   :file
+         :clipping shape
          :path "sdkasdlkals.png"})
 
-(render {:as :show})
+(render-output  {:as :show})
 
-(render {:as     :send
+(render-output  {:as     :send
          :format :JSON})

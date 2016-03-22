@@ -9,4 +9,5 @@
 
 ; TESTAPPLIKATION
 
+
 (def a {:a :test})
