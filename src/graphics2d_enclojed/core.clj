@@ -1,28 +1,10 @@
 (ns graphics2d-enclojed.core
-  (:import (java.awt Color Font Graphics Graphics2D Dimension Composite)
+  (:import (java.awt Color Font Graphics Graphics2D Dimension Composite BasicStroke RenderingHints Component AlphaComposite)
            (java.awt.font TextAttribute)
            (java.awt.image BufferedImage)
            (javax.swing JFrame)
            (java.awt.geom Rectangle2D Rectangle2D$Double)))
 
-
-(def default-g2d (ref nil))
-(def default-image (ref nil))
-(def default-render-settings (ref {:antialiasing         :off
-                                   :aplpha-interpolation :default
-                                   :color-rendering      :quality
-                                   :dithering            :disable
-                                   :fractional-metrics   :on
-                                   :interpolatioin       :bicubic
-                                   :rendering            :quality
-                                   :stroke-control       :normalize
-                                   :text-antialiasing    :off}))
-(def default-shape-settings (ref {:join      :bevel
-                                  :cap       :butt
-                                  :width     0.5
-                                  :dash      0
-                                  :composite :src
-                                  :fill      false}))
 
 (defn create-color
   ([] (. Color Color/white))
@@ -36,11 +18,93 @@
            (= key :orange) (. Color Color/orange)
            (= key :blue) (. Color Color/blue)
            ))
+  ([r g b] (Color. r g b 1))
   ([r g b a] (Color. r g b a)))
 
 (defn create-font
   [key] (cond
           (= key :serif) (. Font Font/SERIF)))
+
+;(def ^:dynamic default-g2d nil)
+;(def ^:dynamic default-image nil)
+
+(def ^:dynamic default-image (BufferedImage. 800 600 BufferedImage/TYPE_INT_ARGB))
+(def ^:dynamic default-g2d (.createGraphics default-image))
+
+(def ^:dynamic default-render-settings {:antialiasing         :off
+                                        :aplpha-interpolation :default
+                                        :color-rendering      :quality
+                                        :dithering            :disable
+                                        :fractional-metrics   :on
+                                        :interpolatioin       :bicubic
+                                        :rendering            :quality
+                                        :stroke-control       :normalize
+                                        :text-antialiasing    :off})
+
+(def ^:dynamic default-shape-settings {:width       1.0
+                                       :join        :miter
+                                       :miter-limit 10.0
+                                       :cap         :square
+                                       :dash        nil
+                                       :dash-phase  0
+                                       :composite   :src
+                                       :alpha       1.0
+                                       })
+
+(def frame (proxy [JFrame] []
+             (paint [#^Graphics g]
+               (.drawImage g default-image 0 0 nil))))
+
+(def stroke-caps {:butt   (BasicStroke/CAP_BUTT)
+                  :round  (BasicStroke/CAP_ROUND)
+                  :square (BasicStroke/CAP_SQUARE)})
+(def stroke-joins {:bevel (BasicStroke/JOIN_BEVEL)
+                   :round (BasicStroke/JOIN_ROUND)
+                   :miter (BasicStroke/JOIN_MITER)})
+
+(def composite-rules {:src      (AlphaComposite/SRC)
+                      :dst_in   (AlphaComposite/DST_IN)
+                      :dst_out  (AlphaComposite/DST_OUT)
+                      :dst_over (AlphaComposite/DST_OVER)
+                      :src_in   (AlphaComposite/DST_OVER)
+                      :src_out  (AlphaComposite/SRC_OUT)
+                      :src_over (AlphaComposite/SRC_OVER)
+                      :clear    (AlphaComposite/CLEAR)})
+
+(def key-antialiasing {:on      [RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_ON]
+                       :off     [RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_OFF]
+                       :default [RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_DEFAULT]})
+(def key-alpha-interpolation {:quality [RenderingHints/KEY_ALPHA_INTERPOLATION RenderingHints/VALUE_ALPHA_INTERPOLATION_QUALITY]
+                              :speed   [RenderingHints/KEY_ALPHA_INTERPOLATION RenderingHints/VALUE_ALPHA_INTERPOLATION_SPEED]
+                              :default [RenderingHints/KEY_ALPHA_INTERPOLATION RenderingHints/VALUE_ALPHA_INTERPOLATION_DEFAULT]})
+(def key-color-rendering {:quality [RenderingHints/KEY_COLOR_RENDERING RenderingHints/VALUE_COLOR_RENDER_QUALITY]
+                          :speed   [RenderingHints/KEY_COLOR_RENDERING RenderingHints/VALUE_COLOR_RENDER_SPEED]
+                          :dfault  [RenderingHints/KEY_COLOR_RENDERING RenderingHints/VALUE_COLOR_RENDER_DEFAULT]})
+(def key-dithering {:disable [RenderingHints/KEY_DITHERING RenderingHints/VALUE_DITHER_DISABLE]
+                    :enable  [RenderingHints/KEY_DITHERING RenderingHints/VALUE_DITHER_ENABLE]
+                    :default [RenderingHints/KEY_DITHERING RenderingHints/VALUE_DITHER_DEFAULT]})
+(def key-fractional-metrics {:on      [RenderingHints/KEY_FRACTIONALMETRICS RenderingHints/VALUE_FRACTIONALMETRICS_ON]
+                             :off     [RenderingHints/KEY_FRACTIONALMETRICS RenderingHints/VALUE_FRACTIONALMETRICS_OFF]
+                             :default [RenderingHints/KEY_FRACTIONALMETRICS RenderingHints/VALUE_FRACTIONALMETRICS_DEFAULT]})
+(def key-interpolation {:bicubic  [RenderingHints/KEY_FRACTIONALMETRICS RenderingHints/VALUE_INTERPOLATION_BICUBIC]
+                        :bilinear [RenderingHints/KEY_INTERPOLATION RenderingHints/VALUE_INTERPOLATION_BILINEAR]
+                        :neighbor [RenderingHints/KEY_INTERPOLATION RenderingHints/VALUE_INTERPOLATION_NEAREST_NEIGHBOR]})
+(def key-rendering {:quality [RenderingHints/KEY_RENDERING RenderingHints/VALUE_RENDER_QUALITY]
+                    :speed   [RenderingHints/KEY_RENDERING RenderingHints/VALUE_RENDER_SPEED]
+                    :default [RenderingHints/KEY_RENDERING RenderingHints/VALUE_RENDER_DEFAULT]})
+(def key-stroke-control {:normalize [RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_NORMALIZE]
+                         :default   [RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_DEFAULT]
+                         :pure      [RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_PURE]})
+(def key-text-antialiasing {:on       [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_ON]
+                            :off      [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_OFF]
+                            :default  [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_DEFAULT]
+                            :gasp     [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_GASP]
+                            :lcd-hrgb [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_HRGB]
+                            :hbgr     [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_HBGR]
+                            :lcd-vrgb [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VRGB]
+                            :lcd-vgbr [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR]})
+
+
 
 (defn create-styled-text [options]
   (let [text ["zu schreibenden texte"]
@@ -74,16 +138,6 @@
 (defn line
   ([image x1 y1 x2 y2 options]))
 
-(defn draw-recatangle
-  ([x y w h settings]
-   (let [g2d (deref default-g2d)
-         rectangle (Rectangle2D$Double. x y w h)]
-     (.setColor g2d (Color. 0.0 0.0 1.0 1.0))
-     (if (:fill settings)
-       (.fill g2d rectangle)
-       (.draw g2d rectangle))
-     )))
-
 (defn ellipse [bufferedImage x1 y1 x2 y2 options])
 
 (defn polygone [bufferedImage points options])
@@ -92,67 +146,85 @@
 
 (defn image [bufferedImage x y ximageToInsert])
 
-(defn set-stroke[join cap width dash]
-  (let [stroke (. Basis)]))
-(defn set-color[color])
-(defn set-composite [comp])
+(defn set-stroke
+  [width cap join miter-limit dash dash-phase]
+  (let [stroke (BasicStroke. width (cap stroke-caps) (join stroke-joins) miter-limit dash dash-phase)]
+    (.setStroke default-g2d stroke)))
 
 
-(defn set-shape-settings [{:keys [join cap width dash composite fill color] :or {join :bevel cap :butt width 0.2 dash 0 composite :src fill false}}]
-  (println "setze optionen für shape")
-  (set-stroke join cap width dash)
-  (set-color color)
-  (set-composite composite)
-  )
+(defn set-color [color]
+  (.setColor default-g2d color))
+
+(defn set-composite [comp alpha]
+  (let [alpha-composite (. AlphaComposite getInstance (comp composite-rules) alpha)]
+    (.setComposite default-g2d alpha-composite)))
+
+
+(defn set-shape-settings
+  ([{:keys [width cap join miter-limit dash dash-phase composite alpha color] :or
+           {width       1.0
+            join        :miter
+            miter-limit 10.0
+            cap         :square
+            dash        nil
+            dash-phase  0
+            composite   :src
+            alpha       1.0}}]
+   (println "setze optionen für shape")
+   (set-stroke width cap join miter-limit dash dash-phase)
+   (set-color color)
+   (set-composite composite alpha)
+    )
+  ([]
+   (set-shape-settings {})))
 
 
 (defn set-render-settings [render-settings]
   (println "setze settings für Rendering")
   (println render-settings))
 
-(defn paint
-  [image]
-  (let [g2d (deref default-g2d)]
-    (.drawImage g2d image nil 0 0)))
-
-(defn show-image [image]
-  (let [image (deref image)
-        frame (new JFrame)
-        dimensison (Dimension. (.getWidth image) (.getHeight image))]
-    (paint image)
+(defn show-image []
+  (let [dimensison (Dimension. (.getWidth default-image) (.getHeight default-image))]
     (doto frame
       (.setSize dimensison)
       (.setVisible true))))
 
+(defn recatangle
+  ([x y w h]
+   (let [rectangle (Rectangle2D$Double. x y w h)]
+     (.draw default-g2d rectangle))
+    )
+  ([x y w h fill]
+   (let [rectangle (Rectangle2D$Double. x y w h)]
+     (if fill
+       (.fill default-g2d rectangle)
+       (.draw default-g2d rectangle))
+     ))
+  ([x y w h fill settings]
+   (set-shape-settings settings)
+   (recatangle x y w h fill)))
+
 (defn render-output
-  ([image {:keys [as path clipping format]}]
+  ([{:keys [as path clipping format]}]
    (if (= as :show)
      (do
        (println "Das Bild wird nun in einem JFrame in der größe des BufferedImage angezeigt")
-       (show-image image))))
-  ([options]
-   (render-output default-image options))
+       (show-image))))
+  ([]
+   (render-output {:as :show}))
   )
 
 ;aufruf nur aus macro "draw" möglich
 (defmacro transform [& functions])
 
 (defmacro create-image
-  "Creates an BufferedImage with given size. Can be used with existing image"
-  ([image]
-   (dosync
-     (ref-set default-image image)
-     (ref-set default-g2d (.createGraphics image))))
-  ([w h & render-settings]
-   (let [image (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
-         render-settings (last render-settings)]
-     `(do
-        (create-image ~image)
-        (if (nil? ~render-settings)
-          (set-render-settings ~(deref default-render-settings))
-          (set-render-settings ~render-settings)
-          )))
-    ))
+  "Creates an BufferedImage with given size."
+  [w h & body]
+  `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)]
+     (binding [default-image image#
+               default-g2d (.createGraphics image#)]
+       (set-render-settings ~default-render-settings)
+       (do ~@body))))
 
 
 
