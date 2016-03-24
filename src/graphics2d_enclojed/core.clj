@@ -30,17 +30,6 @@
 
 (def ^:dynamic default-image (BufferedImage. 800 600 BufferedImage/TYPE_INT_ARGB))
 (def ^:dynamic default-g2d (.createGraphics default-image))
-
-(def ^:dynamic default-render-settings {:antialiasing         :off
-                                        :aplpha-interpolation :default
-                                        :color-rendering      :quality
-                                        :dithering            :disable
-                                        :fractional-metrics   :on
-                                        :interpolatioin       :bicubic
-                                        :rendering            :quality
-                                        :stroke-control       :normalize
-                                        :text-antialiasing    :off})
-
 (def ^:dynamic default-shape-settings {:width       1.0
                                        :join        :miter
                                        :miter-limit 10.0
@@ -50,6 +39,16 @@
                                        :composite   :src
                                        :alpha       1.0
                                        })
+
+(def default-render-settings {:antialiasing         :off
+                              :aplpha-interpolation :default
+                              :color-rendering      :quality
+                              :dithering            :disable
+                              :fractional-metrics   :on
+                              :interpolatioin       :bicubic
+                              :rendering            :quality
+                              :stroke-control       :normalize
+                              :text-antialiasing    :off})
 
 (def frame (proxy [JFrame] []
              (paint [#^Graphics g]
@@ -71,46 +70,52 @@
                       :src_over (AlphaComposite/SRC_OVER)
                       :clear    (AlphaComposite/CLEAR)})
 
-(def key-antialiasing {:on      [RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_ON]
-                       :off     [RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_OFF]
-                       :default [RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_DEFAULT]})
-(def key-alpha-interpolation {:quality [RenderingHints/KEY_ALPHA_INTERPOLATION RenderingHints/VALUE_ALPHA_INTERPOLATION_QUALITY]
-                              :speed   [RenderingHints/KEY_ALPHA_INTERPOLATION RenderingHints/VALUE_ALPHA_INTERPOLATION_SPEED]
-                              :default [RenderingHints/KEY_ALPHA_INTERPOLATION RenderingHints/VALUE_ALPHA_INTERPOLATION_DEFAULT]})
-(def key-color-rendering {:quality [RenderingHints/KEY_COLOR_RENDERING RenderingHints/VALUE_COLOR_RENDER_QUALITY]
-                          :speed   [RenderingHints/KEY_COLOR_RENDERING RenderingHints/VALUE_COLOR_RENDER_SPEED]
-                          :dfault  [RenderingHints/KEY_COLOR_RENDERING RenderingHints/VALUE_COLOR_RENDER_DEFAULT]})
-(def key-dithering {:disable [RenderingHints/KEY_DITHERING RenderingHints/VALUE_DITHER_DISABLE]
-                    :enable  [RenderingHints/KEY_DITHERING RenderingHints/VALUE_DITHER_ENABLE]
-                    :default [RenderingHints/KEY_DITHERING RenderingHints/VALUE_DITHER_DEFAULT]})
-(def key-fractional-metrics {:on      [RenderingHints/KEY_FRACTIONALMETRICS RenderingHints/VALUE_FRACTIONALMETRICS_ON]
-                             :off     [RenderingHints/KEY_FRACTIONALMETRICS RenderingHints/VALUE_FRACTIONALMETRICS_OFF]
-                             :default [RenderingHints/KEY_FRACTIONALMETRICS RenderingHints/VALUE_FRACTIONALMETRICS_DEFAULT]})
-(def key-interpolation {:bicubic  [RenderingHints/KEY_FRACTIONALMETRICS RenderingHints/VALUE_INTERPOLATION_BICUBIC]
-                        :bilinear [RenderingHints/KEY_INTERPOLATION RenderingHints/VALUE_INTERPOLATION_BILINEAR]
-                        :neighbor [RenderingHints/KEY_INTERPOLATION RenderingHints/VALUE_INTERPOLATION_NEAREST_NEIGHBOR]})
-(def key-rendering {:quality [RenderingHints/KEY_RENDERING RenderingHints/VALUE_RENDER_QUALITY]
-                    :speed   [RenderingHints/KEY_RENDERING RenderingHints/VALUE_RENDER_SPEED]
-                    :default [RenderingHints/KEY_RENDERING RenderingHints/VALUE_RENDER_DEFAULT]})
-(def key-stroke-control {:normalize [RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_NORMALIZE]
-                         :default   [RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_DEFAULT]
-                         :pure      [RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_PURE]})
-(def key-text-antialiasing {:on       [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_ON]
-                            :off      [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_OFF]
-                            :default  [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_DEFAULT]
-                            :gasp     [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_GASP]
-                            :lcd-hrgb [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_HRGB]
-                            :hbgr     [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_HBGR]
-                            :lcd-vrgb [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VRGB]
-                            :lcd-vgbr [RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR]})
+(def keys-antialiasing {:on      (RenderingHints/VALUE_ANTIALIAS_ON)
+                        :off     (RenderingHints/VALUE_ANTIALIAS_OFF)
+                        :default (RenderingHints/VALUE_ANTIALIAS_DEFAULT)})
+
+(def keys-alpha-interpolation {:quality (RenderingHints/VALUE_ALPHA_INTERPOLATION_QUALITY)
+                               :speed   (RenderingHints/VALUE_ALPHA_INTERPOLATION_SPEED)
+                               :default (RenderingHints/VALUE_ALPHA_INTERPOLATION_DEFAULT)})
+
+(def keys-color-rendering {:quality (RenderingHints/VALUE_COLOR_RENDER_QUALITY)
+                           :speed   (RenderingHints/VALUE_COLOR_RENDER_SPEED)
+                           :dfault  (RenderingHints/VALUE_COLOR_RENDER_DEFAULT)})
+
+(def keys-dithering {:disable (RenderingHints/VALUE_DITHER_DISABLE)
+                     :enable  (RenderingHints/VALUE_DITHER_ENABLE)
+                     :default (RenderingHints/VALUE_DITHER_DEFAULT)})
+
+(def keys-fractional-metrics {:on      (RenderingHints/VALUE_FRACTIONALMETRICS_ON)
+                              :off     (RenderingHints/VALUE_FRACTIONALMETRICS_OFF)
+                              :default (RenderingHints/VALUE_FRACTIONALMETRICS_DEFAULT)})
+
+(def keys-interpolation {:bicubic  (RenderingHints/VALUE_INTERPOLATION_BICUBIC)
+                         :bilinear (RenderingHints/VALUE_INTERPOLATION_BILINEAR)
+                         :neighbor (RenderingHints/VALUE_INTERPOLATION_NEAREST_NEIGHBOR)})
+
+(def keys-rendering {:quality (RenderingHints/VALUE_RENDER_QUALITY)
+                     :speed   (RenderingHints/VALUE_RENDER_SPEED)
+                     :default (RenderingHints/VALUE_RENDER_DEFAULT)})
+
+(def keys-stroke-control {:normalize (RenderingHints/VALUE_STROKE_NORMALIZE)
+                           :default   (RenderingHints/VALUE_STROKE_DEFAULT)
+                           :pure      (RenderingHints/VALUE_STROKE_PURE)})
+
+(def keys-text-antialiasing {:on       (RenderingHints/VALUE_TEXT_ANTIALIAS_ON)
+                              :off      (RenderingHints/VALUE_TEXT_ANTIALIAS_OFF)
+                              :default  (RenderingHints/VALUE_TEXT_ANTIALIAS_DEFAULT)
+                              :gasp     (RenderingHints/VALUE_TEXT_ANTIALIAS_GASP)
+                              :lcd-hrgb (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_HRGB)
+                              :hbgr     (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_HBGR)
+                              :lcd-vrgb (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VRGB)
+                              :lcd-vgbr (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR)})
 
 
 
 (defn create-styled-text [options]
   (let [text ["zu schreibenden texte"]
         textAttributes "hashmap defineiren nach argumenten"]))
-
-(defn setOptions [options])
 
 ;transformation
 (defn shear [num num])
@@ -146,11 +151,12 @@
 
 (defn image [bufferedImage x y ximageToInsert])
 
+
+
 (defn set-stroke
   [width cap join miter-limit dash dash-phase]
   (let [stroke (BasicStroke. width (cap stroke-caps) (join stroke-joins) miter-limit dash dash-phase)]
     (.setStroke default-g2d stroke)))
-
 
 (defn set-color [color]
   (.setColor default-g2d color))
@@ -158,7 +164,6 @@
 (defn set-composite [comp alpha]
   (let [alpha-composite (. AlphaComposite getInstance (comp composite-rules) alpha)]
     (.setComposite default-g2d alpha-composite)))
-
 
 (defn set-shape-settings
   ([{:keys [width cap join miter-limit dash dash-phase composite alpha color] :or
@@ -170,7 +175,6 @@
             dash-phase  0
             composite   :src
             alpha       1.0}}]
-   (println "setze optionen für shape")
    (set-stroke width cap join miter-limit dash dash-phase)
    (set-color color)
    (set-composite composite alpha)
@@ -179,9 +183,29 @@
    (set-shape-settings {})))
 
 
-(defn set-render-settings [render-settings]
-  (println "setze settings für Rendering")
-  (println render-settings))
+(defn set-rendering-hints [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing] :or
+                                  {antialiasing :off
+                                   aplpha-interpolation :default
+                                   color-rendering :quality
+                                   dithering :disable
+                                   fractional-metrics :on
+                                   interpolatioin :bicubic
+                                   rendering :quality
+                                   stroke-control :normalize
+                                   text-antialiasing :off}}]
+  (let [rendering-hints {(RenderingHints/KEY_ANTIALIASING) (antialiasing keys-antialiasing)
+                         (RenderingHints/KEY_ALPHA_INTERPOLATION) (aplpha-interpolation keys-alpha-interpolation)
+                         (RenderingHints/KEY_COLOR_RENDERING) (color-rendering keys-color-rendering)
+                         (RenderingHints/KEY_DITHERING) (dithering keys-dithering)
+                         (RenderingHints/KEY_FRACTIONALMETRICS) (fractional-metrics keys-fractional-metrics)
+                         (RenderingHints/KEY_INTERPOLATION) (interpolatioin keys-interpolation)
+                         (RenderingHints/KEY_RENDERING) (rendering keys-rendering)
+                         (RenderingHints/KEY_STROKE_CONTROL) (stroke-control keys-stroke-control)
+                         (RenderingHints/KEY_TEXT_ANTIALIASING) (text-antialiasing keys-text-antialiasing)}]
+    (.setRenderingHints default-g2d rendering-hints)))
+
+(defn repaint []
+  (.repaint frame))
 
 (defn show-image []
   (let [dimensison (Dimension. (.getWidth default-image) (.getHeight default-image))]
@@ -189,20 +213,23 @@
       (.setSize dimensison)
       (.setVisible true))))
 
-(defn recatangle
+(defn rectangle
   ([x y w h]
    (let [rectangle (Rectangle2D$Double. x y w h)]
      (.draw default-g2d rectangle))
     )
   ([x y w h fill]
    (let [rectangle (Rectangle2D$Double. x y w h)]
-     (if fill
+     (if (= fill :fill)
        (.fill default-g2d rectangle)
        (.draw default-g2d rectangle))
      ))
   ([x y w h fill settings]
    (set-shape-settings settings)
-   (recatangle x y w h fill)))
+   (rectangle x y w h fill)))
+
+(defn set-background [color]
+  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) :fill {:composite :src :color color}))
 
 (defn render-output
   ([{:keys [as path clipping format]}]
@@ -223,7 +250,7 @@
   `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)]
      (binding [default-image image#
                default-g2d (.createGraphics image#)]
-       (set-render-settings ~default-render-settings)
+       (set-rendering-hints ~default-render-settings)
        (do ~@body))))
 
 
