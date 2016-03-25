@@ -22,8 +22,8 @@
   ([r g b a] (Color. r g b a)))
 
 (defn create-font
-  [key] (cond
-          (= key :serif) (. Font Font/SERIF)))
+  [name sytle size] (cond
+                      (= key :serif) (. Font Font/SERIF)))
 
 ;(def ^:dynamic default-g2d nil)
 ;(def ^:dynamic default-image nil)
@@ -54,6 +54,8 @@
 (def frame (proxy [JFrame] []
              (paint [#^Graphics g]
                (.drawImage g default-image 0 0 nil))))
+
+
 
 (def stroke-caps {:butt   (BasicStroke/CAP_BUTT)
                   :round  (BasicStroke/CAP_ROUND)
@@ -103,6 +105,53 @@
                           :default   (RenderingHints/VALUE_STROKE_DEFAULT)
                           :pure      (RenderingHints/VALUE_STROKE_PURE)})
 
+(def font-styles {:plain            (Font/PLAIN)
+                  :bold             (Font/BOLD)
+                  :italic           (Font/ITALIC)
+                  :roman-baseline   (Font/ROMAN_BASELINE)
+                  :center-baseline  (Font/CENTER_BASELINE)
+                  :hanging-baseline (Font/HANGING_BASELINE)
+                  :true-type-font   (Font/TRUETYPE_FONT)
+                  :type1-font       (Font/TYPE1_FONT)})
+
+(def fonts {:dialog       (Font/DIALOG)
+            :dialog-input (Font/DIALOG_INPUT)
+            :sans-serif   (Font/SANS_SERIF)
+            :serif        (Font/SERIF)
+            :momospaced   (Font/MONOSPACED)
+            :times        "Times New Roman"})
+
+(def text-weight {
+                  :weight-extra-light (TextAttribute/WEIGHT_EXTRA_LIGHT)
+                  :weight-light       (TextAttribute/WEIGHT_LIGHT)
+                  :weight-demilight   (TextAttribute/WEIGHT_DEMILIGHT)
+                  :weight-regular     (TextAttribute/WEIGHT_REGULAR)
+                  :weight-medium      (TextAttribute/WEIGHT_MEDIUM)
+                  :weight-semibold    (TextAttribute/WEIGHT_SEMIBOLD)
+                  :weight-demibold    (TextAttribute/WEIGHT_DEMIBOLD)
+                  :weight-bold        (TextAttribute/WEIGHT_BOLD)
+                  :weight-heavy       (TextAttribute/WEIGHT_HEAVY)
+                  :weight-extrabold   (TextAttribute/WEIGHT_EXTRABOLD)
+                  :weight-ultrabold   (TextAttribute/WEIGHT_ULTRABOLD)})
+(def text-width {
+                 :width-condensed      (TextAttribute/WIDTH_CONDENSED)
+                 :width-semi-condensed (TextAttribute/WIDTH_SEMI_CONDENSED)
+                 :width-regular        (TextAttribute/WIDTH_REGULAR)
+                 :width-semi-extended  (TextAttribute/WIDTH_SEMI_EXTENDED)
+                 :width-extended       (TextAttribute/WIDTH_EXTENDED)})
+
+(def text-posture {:posture-regular  (TextAttribute/POSTURE_REGULAR)
+                   :posture-onlique (TextAttribute/POSTURE_OBLIQUE)})
+
+(def text-underline {:underline-low-on-pixel  (TextAttribute/UNDERLINE_LOW_ONE_PIXEL)
+                     :underline-low-two-pixel (TextAttribute/UNDERLINE_LOW_TWO_PIXEL)
+                     :underline-low-dotted    (TextAttribute/UNDERLINE_LOW_DOTTED)
+                     :underline-low-gray      (TextAttribute/UNDERLINE_LOW_GRAY)
+                     :underline-low-dashed    (TextAttribute/UNDERLINE_LOW_DASHED)})
+
+(def text-ground {:foreground (TextAttribute/FOREGROUND)
+                  :background (TextAttribute/BACKGROUND)})
+
 (def keys-text-antialiasing {:on       (RenderingHints/VALUE_TEXT_ANTIALIAS_ON)
                              :off      (RenderingHints/VALUE_TEXT_ANTIALIAS_OFF)
                              :default  (RenderingHints/VALUE_TEXT_ANTIALIAS_DEFAULT)
@@ -111,12 +160,6 @@
                              :hbgr     (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_HBGR)
                              :lcd-vrgb (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VRGB)
                              :lcd-vgbr (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR)})
-
-
-
-(defn create-styled-text [options]
-  (let [text ["zu schreibenden texte"]
-        textAttributes "hashmap defineiren nach argumenten"]))
 
 ;transformation
 (defn shear [num num])
@@ -152,6 +195,10 @@
 
 (defn image [bufferedImage x y ximageToInsert])
 
+
+(defn create-styled-text [text settings]
+  (let [text ["zu schreibenden texte"]
+        textAttributes "hashmap defineiren nach argumenten"]))
 
 
 (defn set-stroke
