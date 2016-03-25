@@ -140,7 +140,7 @@
                  :width-semi-extended  (TextAttribute/WIDTH_SEMI_EXTENDED)
                  :width-extended       (TextAttribute/WIDTH_EXTENDED)})
 
-(def text-posture {:posture-regular  (TextAttribute/POSTURE_REGULAR)
+(def text-posture {:posture-regular (TextAttribute/POSTURE_REGULAR)
                    :posture-onlique (TextAttribute/POSTURE_OBLIQUE)})
 
 (def text-underline {:underline-low-on-pixel  (TextAttribute/UNDERLINE_LOW_ONE_PIXEL)
@@ -161,44 +161,17 @@
                              :lcd-vrgb (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VRGB)
                              :lcd-vgbr (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR)})
 
-;transformation
-(defn shear [num num])
-
-(defn tranlate [x y])
-
-(defn scale [num num])
-
-(defn rotate
-  ([num])
-  ([num, x, y]))
-
-(defn rotate [num])
-
-(defn load-image [source & options])
-
-(defn crop [image method & size])
-
-(defn resize [h w])
-
-(defn hit [x1 y1 x2 y2])
-
-(defn write-string! [bufferedImage x1 y1 x2 y2 text])
-
-(defn line
-  ([image x1 y1 x2 y2 options]))
-
-(defn ellipse [bufferedImage x1 y1 x2 y2 options])
-
-(defn polygone [bufferedImage points options])
-
-(defn generalpath [bufferedImage functions options])
-
-(defn image [bufferedImage x y ximageToInsert])
 
 
-(defn create-styled-text [text settings]
+
+(defn create-styled-text [text {:keys [weight width underline ground strike-through swap-colors kerning]}]
   (let [text ["zu schreibenden texte"]
-        textAttributes "hashmap defineiren nach argumenten"]))
+        textAttributes {}]
+    (println kerning)
+    (when-> textAttributes
+            kerning (assoc (TextAttribute/KERNING) (TextAttribute/KERNING_ON))
+            strike-through (assoc (TextAttribute/STRIKETHROUGH) (TextAttribute/STRIKETHROUGH_ON)))
+            ))
 
 
 (defn set-stroke
@@ -329,4 +302,51 @@
   ())
 
 
-;Hilfsfunktionen
+;transformation
+(defn shear [num num])
+
+(defn tranlate [x y])
+
+(defn scale [num num]
+  )
+
+(defn rotate
+  ([num])
+  ([num, x, y]))
+
+(defn rotate [num])
+
+(defn load-image [source & options])
+
+(defn crop [image method & size])
+
+(defn resize [h w])
+
+(defn hit [x1 y1 x2 y2])
+
+(defn write-string! [bufferedImage x1 y1 x2 y2 text])
+
+(defn line
+  ([image x1 y1 x2 y2 options]))
+
+(defn ellipse [bufferedImage x1 y1 x2 y2 options])
+
+(defn polygone [bufferedImage points options])
+
+(defn generalpath [bufferedImage functions options])
+
+(defn image [bufferedImage x y ximageToInsert])
+
+(defmacro when->
+  {:added "1.0"}
+  [x & forms]
+  (loop [x x, forms forms]
+    (if forms
+      (let [test (first forms)
+            form (second forms)
+            threaded (if (seq? form)
+                       (with-meta `(if ~test (~(first form) ~x ~@(next form))
+                                             ~x) (meta form))
+                       (list form x))]
+        (recur threaded (next (next forms))))
+      x)))
