@@ -6,6 +6,26 @@
            (java.awt.geom Rectangle2D$Double Line2D$Double)))
 
 
+(defmacro when->
+  {:added "1.0"}
+  [x & forms]
+  (if-not (= 0 (mod (count forms) 2))
+    (throw (RuntimeException.
+             "The when-> macro must contain a even number of arguments")))
+  (loop [x x, forms forms]
+    ;(if-not (= java.lang.Boolean (first forms))
+    ;  (throw (RuntimeException.
+    ;           "Wrong Type. Use boolean for first und function for second argument")))
+    (if forms
+      (let [test (first forms)
+            form (second forms)
+            threaded (if (seq? form)
+                       (with-meta `(if ~test (~(first form) ~x ~@(next form))
+                                             ~x) (meta form))
+                       (list form x))]
+        (recur threaded (next (next forms))))
+      x)))
+
 (defn create-color
   ([] (. Color Color/white))
   ([key] (cond
@@ -21,9 +41,7 @@
   ([r g b] (Color. r g b 1))
   ([r g b a] (Color. r g b a)))
 
-(defn create-font
-  [name sytle size] (cond
-                      (= key :serif) (. Font Font/SERIF)))
+
 
 ;(def ^:dynamic default-g2d nil)
 ;(def ^:dynamic default-image nil)
@@ -122,35 +140,33 @@
             :times        "Times New Roman"})
 
 (def text-weight {
-                  :weight-extra-light (TextAttribute/WEIGHT_EXTRA_LIGHT)
-                  :weight-light       (TextAttribute/WEIGHT_LIGHT)
-                  :weight-demilight   (TextAttribute/WEIGHT_DEMILIGHT)
-                  :weight-regular     (TextAttribute/WEIGHT_REGULAR)
-                  :weight-medium      (TextAttribute/WEIGHT_MEDIUM)
-                  :weight-semibold    (TextAttribute/WEIGHT_SEMIBOLD)
-                  :weight-demibold    (TextAttribute/WEIGHT_DEMIBOLD)
-                  :weight-bold        (TextAttribute/WEIGHT_BOLD)
-                  :weight-heavy       (TextAttribute/WEIGHT_HEAVY)
-                  :weight-extrabold   (TextAttribute/WEIGHT_EXTRABOLD)
-                  :weight-ultrabold   (TextAttribute/WEIGHT_ULTRABOLD)})
+                  :extra-light (TextAttribute/WEIGHT_EXTRA_LIGHT)
+                  :light       (TextAttribute/WEIGHT_LIGHT)
+                  :demilight   (TextAttribute/WEIGHT_DEMILIGHT)
+                  :regular     (TextAttribute/WEIGHT_REGULAR)
+                  :medium      (TextAttribute/WEIGHT_MEDIUM)
+                  :semibold    (TextAttribute/WEIGHT_SEMIBOLD)
+                  :demibold    (TextAttribute/WEIGHT_DEMIBOLD)
+                  :bold        (TextAttribute/WEIGHT_BOLD)
+                  :heavy       (TextAttribute/WEIGHT_HEAVY)
+                  :extrabold   (TextAttribute/WEIGHT_EXTRABOLD)
+                  :ultrabold   (TextAttribute/WEIGHT_ULTRABOLD)})
 (def text-width {
-                 :width-condensed      (TextAttribute/WIDTH_CONDENSED)
-                 :width-semi-condensed (TextAttribute/WIDTH_SEMI_CONDENSED)
-                 :width-regular        (TextAttribute/WIDTH_REGULAR)
-                 :width-semi-extended  (TextAttribute/WIDTH_SEMI_EXTENDED)
-                 :width-extended       (TextAttribute/WIDTH_EXTENDED)})
+                 :condensed      (TextAttribute/WIDTH_CONDENSED)
+                 :semi-condensed (TextAttribute/WIDTH_SEMI_CONDENSED)
+                 :regular        (TextAttribute/WIDTH_REGULAR)
+                 :semi-extended  (TextAttribute/WIDTH_SEMI_EXTENDED)
+                 :extended       (TextAttribute/WIDTH_EXTENDED)})
 
-(def text-posture {:posture-regular (TextAttribute/POSTURE_REGULAR)
-                   :posture-onlique (TextAttribute/POSTURE_OBLIQUE)})
+(def text-posture {:regular (TextAttribute/POSTURE_REGULAR)
+                   :onlique (TextAttribute/POSTURE_OBLIQUE)})
 
-(def text-underline {:underline-low-on-pixel  (TextAttribute/UNDERLINE_LOW_ONE_PIXEL)
-                     :underline-low-two-pixel (TextAttribute/UNDERLINE_LOW_TWO_PIXEL)
-                     :underline-low-dotted    (TextAttribute/UNDERLINE_LOW_DOTTED)
-                     :underline-low-gray      (TextAttribute/UNDERLINE_LOW_GRAY)
-                     :underline-low-dashed    (TextAttribute/UNDERLINE_LOW_DASHED)})
+(def text-underline {:low-on-pixel  (TextAttribute/UNDERLINE_LOW_ONE_PIXEL)
+                     :low-two-pixel (TextAttribute/UNDERLINE_LOW_TWO_PIXEL)
+                     :low-dotted    (TextAttribute/UNDERLINE_LOW_DOTTED)
+                     :low-gray      (TextAttribute/UNDERLINE_LOW_GRAY)
+                     :low-dashed    (TextAttribute/UNDERLINE_LOW_DASHED)})
 
-(def text-ground {:foreground (TextAttribute/FOREGROUND)
-                  :background (TextAttribute/BACKGROUND)})
 
 (def keys-text-antialiasing {:on       (RenderingHints/VALUE_TEXT_ANTIALIAS_ON)
                              :off      (RenderingHints/VALUE_TEXT_ANTIALIAS_OFF)
@@ -162,16 +178,26 @@
                              :lcd-vgbr (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR)})
 
 
+(defn create-font
+  [name style size]
+  (Font. (name fonts) (style font-styles) size)
+  )
 
+(defn create-styled-text [text font {:keys [weight width underline foreground background strike-through swap-colors kerning]}]
+  (println kerning)
+  (let [styled-font (when-> {}
+                            kerning (assoc (TextAttribute/KERNING) (TextAttribute/KERNING_ON))
+                            strike-through (assoc (TextAttribute/STRIKETHROUGH) (TextAttribute/STRIKETHROUGH_ON))
+                            swap-colors (assoc (TextAttribute/SWAP_COLORS) (TextAttribute/SWAP_COLORS_ON))
+                            width (assoc (TextAttribute/WIDTH) (width text-width))
+                            weight (assoc (TextAttribute/WEIGHT) (weight text-weight))
+                            underline (assoc (TextAttribute/UNDERLINE) (underline text-underline))
+                            foreground (assoc (TextAttribute/FOREGROUND) foreground)
+                            background (assoc (TextAttribute/BACKGROUND) background))]
 
-(defn create-styled-text [text {:keys [weight width underline ground strike-through swap-colors kerning]}]
-  (let [text ["zu schreibenden texte"]
-        textAttributes {}]
-    (println kerning)
-    (when-> textAttributes
-            kerning (assoc (TextAttribute/KERNING) (TextAttribute/KERNING_ON))
-            strike-through (assoc (TextAttribute/STRIKETHROUGH) (TextAttribute/STRIKETHROUGH_ON)))
-            ))
+    (-> {}
+        (assoc :text text)
+        (assoc :font (.deriveFont font styled-font)))))
 
 
 (defn set-stroke
@@ -181,6 +207,9 @@
 
 (defn set-color [color]
   (.setColor default-g2d color))
+
+(defn set-font [font]
+  (.setFont default-g2d font))
 
 (defn set-composite [comp alpha]
   (let [alpha-composite (. AlphaComposite getInstance (comp composite-rules) alpha)]
@@ -239,6 +268,14 @@
     (doto frame
       (.setSize dimensison)
       (.setVisible true))))
+
+(defn styled-text [x y styled-text]
+  (let [old-font (.getFont default-g2d)]
+    (.setFont default-g2d (:font styled-text))
+    (.drawString default-g2d (:text styled-text) x y )
+    (.setFont default-g2d old-font)
+    ))
+
 
 (defn line
   ([x1 y1 x2 y2 settings]
@@ -337,16 +374,4 @@
 
 (defn image [bufferedImage x y ximageToInsert])
 
-(defmacro when->
-  {:added "1.0"}
-  [x & forms]
-  (loop [x x, forms forms]
-    (if forms
-      (let [test (first forms)
-            form (second forms)
-            threaded (if (seq? form)
-                       (with-meta `(if ~test (~(first form) ~x ~@(next form))
-                                             ~x) (meta form))
-                       (list form x))]
-        (recur threaded (next (next forms))))
-      x)))
+
