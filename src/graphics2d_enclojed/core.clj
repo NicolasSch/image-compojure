@@ -1,9 +1,11 @@
 (ns graphics2d-enclojed.core
   (:import (java.awt Color Font Graphics Graphics2D Dimension Composite BasicStroke RenderingHints AlphaComposite)
            (java.awt.font TextAttribute)
-           (java.awt.image BufferedImage)
+           (java.awt.image BufferedImage RescaleOp)
            (javax.swing JFrame)
-           (java.awt.geom Rectangle2D$Double Line2D$Double)))
+           (java.awt.geom Rectangle2D$Double Line2D$Double AffineTransform)
+           (javax.imageio ImageIO)
+           (java.io File)))
 
 
 (defmacro when->
@@ -29,7 +31,7 @@
 (defn create-color
   ([] (. Color Color/white))
   ([key] (cond
-           (= key :green) (Color. Color/green)
+           (= key :green) (. Color Color/green)
            (= key :blue) (. Color Color/blue)
            (= key :red) (. Color Color/red)
            (= key :black) (. Color Color/black)
@@ -272,18 +274,18 @@
 (defn styled-text [x y styled-text]
   (let [old-font (.getFont default-g2d)]
     (.setFont default-g2d (:font styled-text))
-    (.drawString default-g2d (:text styled-text) x y )
+    (.drawString default-g2d (:text styled-text) x y)
     (.setFont default-g2d old-font)
     ))
 
 
 (defn line
+  ([x1 y1 x2 y2]
+   (.draw default-g2d (Line2D$Double. x1 y1 x2 y2)))
   ([x1 y1 x2 y2 settings]
    (set-shape-settings settings)
    (line x1 y1 x2 y2)
    (reset-shape-settings))
-  ([x1 y1 x2 y2]
-   (.draw default-g2d (Line2D$Double. x1 y1 x2 y2)))
   )
 
 (defn rectangle
@@ -304,6 +306,34 @@
 
 (defn set-background [color]
   (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) :fill {:composite :src :color color}))
+
+(defn create-scaleOp [& rgba]
+  (RescaleOp. (float-array rgba) (float-array 4) nil))
+
+(defn image
+  ([x y img]
+   (image x y img {}))
+
+  ([x y img settings]
+   (if (:composite settings)
+     (set-shape-settings settings))
+   (if filter
+     (.drawImage default-g2d img (:filter settings) x y)
+     (.drawImage default-g2d img x y nil))
+   (reset-shape-settings))
+
+  ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src]
+   (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img {}))
+
+  ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings]
+   (if (:composite settings)
+     (set-shape-settings settings))
+   (.drawImage default-g2d x1dest y1dest x2dest y2dest x1src y1src x2src y2src img nil)
+   (reset-shape-settings)))
+
+(defn load-image [source]
+  (ImageIO/read (File. source)))
+
 
 (defn render-output
   ([{:keys [as path clipping format]}]
@@ -353,8 +383,6 @@
 
 (defn rotate [num])
 
-(defn load-image [source & options])
-
 (defn crop [image method & size])
 
 (defn resize [h w])
@@ -363,15 +391,11 @@
 
 (defn write-string! [bufferedImage x1 y1 x2 y2 text])
 
-(defn line
-  ([image x1 y1 x2 y2 options]))
-
 (defn ellipse [bufferedImage x1 y1 x2 y2 options])
 
 (defn polygone [bufferedImage points options])
 
 (defn generalpath [bufferedImage functions options])
 
-(defn image [bufferedImage x y ximageToInsert])
 
 
