@@ -10,6 +10,7 @@ Shapes zeichnen
         - Genral Path
     -default-shape-settings
     -Shape settings setzen
+    -GradientPaint
 
 Diverse nützliche Funktionen
     - Fonts erstellen --> erledigt

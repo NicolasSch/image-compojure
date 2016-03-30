@@ -3,12 +3,13 @@
            (java.awt.font TextAttribute)
            (java.awt.image BufferedImage RescaleOp)
            (javax.swing JFrame)
-           (java.awt.geom Rectangle2D$Double Line2D$Double AffineTransform)
+           (java.awt.geom Rectangle2D$Double Line2D$Double AffineTransform GeneralPath)
            (javax.imageio ImageIO)
            (java.io File)))
 
 
 (defmacro when->
+  "Similar to -> but checks logical truthiness of first form. Calls second form on object."
   {:added "1.0"}
   [x & forms]
   (if-not (= 0 (mod (count forms) 2))
@@ -29,6 +30,7 @@
       x)))
 
 (defn create-color
+  "Returns Java.awt.Color Object. Cann be called with key to get predefiend Java Colors or R G B a values 0-1"
   ([] (. Color Color/white))
   ([key] (cond
            (= key :green) (. Color Color/green)
@@ -48,7 +50,7 @@
 ;(def ^:dynamic default-g2d nil)
 ;(def ^:dynamic default-image nil)
 
-(def ^:dynamic default-image (BufferedImage. 800 600 BufferedImage/TYPE_INT_ARGB))
+(def ^:dynamic default-image (BufferedImage. 1920 1080 BufferedImage/TYPE_INT_ARGB))
 (def ^:dynamic default-g2d (.createGraphics default-image))
 (def ^:dynamic default-shape-values {:width       1.0
                                      :join        :miter
@@ -181,13 +183,21 @@
 
 
 (defn create-font
-  [name style size]
-  (Font. (name fonts) (style font-styles) size)
-  )
+  "Returns a logical Font which can be used on any Java platform. Font must be defiend in fonts map"
+  ([name style size]
+   (Font. (name fonts) (style font-styles) size)
+    ))
 
-(defn create-styled-text [text font {:keys [weight width underline foreground background strike-through swap-colors kerning]}]
-  (println kerning)
-  (let [styled-font (when-> {}
+
+(defn create-styled-text [text {:keys [name style size weight width underline foreground background strike-through swap-colors kerning]}]
+  "Creates a map containing the text which shall be drawn to the default-g2d object as String and a font defined by
+  FontfamilyName, Style, Size and Textattributes
+  For available FontFamilys and styles see defiend maps fonts and font-styles
+  Available Textatrributes can be seen in maps: text-weight, text-width, text-posture, text-underline.
+  Furthermore font can be defient by the keys: :kerning bool, :swap-colors bool , :foreground Color, :background Color,
+  :name String(FontFamilyName), style"
+  (let [font (create-font name style size)
+        styled-font (when-> {}
                             kerning (assoc (TextAttribute/KERNING) (TextAttribute/KERNING_ON))
                             strike-through (assoc (TextAttribute/STRIKETHROUGH) (TextAttribute/STRIKETHROUGH_ON))
                             swap-colors (assoc (TextAttribute/SWAP_COLORS) (TextAttribute/SWAP_COLORS_ON))
@@ -203,28 +213,35 @@
 
 
 (defn set-stroke
+  "Sets stroke attributes on default-g2d object"
   [width cap join miter-limit dash dash-phase]
   (let [stroke (BasicStroke. width (cap stroke-caps) (join stroke-joins) miter-limit dash dash-phase)]
     (.setStroke default-g2d stroke)))
 
 (defn set-color [color]
+  "Sets paint color on default-g2d object "
   (.setColor default-g2d color))
 
 (defn set-font [font]
+  "Sets font on default-g2d object"
   (.setFont default-g2d font))
 
 (defn set-composite [comp alpha]
+  "Sets composite attribute on default-g2d object"
   (let [alpha-composite (. AlphaComposite getInstance (comp composite-rules) alpha)]
     (.setComposite default-g2d alpha-composite)))
 
 (defn set-shape-settings
+  "Sets attributes for stroke color and composite to default-g2d object."
   ([{:keys [width cap join miter-limit dash dash-phase composite alpha color]}]
    (if (or width cap join miter-limit dash dash-phase)
      (let [width (or width (:width default-shape-values))
            cap (or cap (:cap default-shape-values))
            join (or join (:join default-shape-values))
            miter-limit (or miter-limit (:miter-limit default-shape-values))
-           dash (or dash (:dash default-shape-values))
+           dash (if dash
+                  (float-array dash)
+                  (:dash default-shape-values))
            dash-phase (or dash-phase (:dash-phase default-shape-values))]
        (println width cap join miter-limit dash dash-phase composite alpha color)
        (set-stroke width cap join miter-limit dash dash-phase)
@@ -239,9 +256,12 @@
    (set-shape-settings default-shape-values)))
 
 (defn reset-shape-settings []
+  "Calls on set-shape-settings to reset shape-settings back to defined default-shape-settings"
   (set-shape-settings))
 
-(defn set-rendering-hints [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing] :or
+(defn set-rendering-hints
+  "Is called on create-image macro to set renderinghints on default-g2d object"
+  [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing] :or
                                   {antialiasing         :off
                                    aplpha-interpolation :default
                                    color-rendering      :quality
@@ -263,15 +283,18 @@
     (.setRenderingHints default-g2d rendering-hints)))
 
 (defn repaint []
+  "Repaint default-image in displayed JFrame"
   (.repaint frame))
 
 (defn show-image []
+  "Show default-image in Jframe"
   (let [dimensison (Dimension. (.getWidth default-image) (.getHeight default-image))]
     (doto frame
       (.setSize dimensison)
       (.setVisible true))))
 
 (defn styled-text [x y styled-text]
+  "Draws previously created styledtext map to default-g2d object"
   (let [old-font (.getFont default-g2d)]
     (.setFont default-g2d (:font styled-text))
     (.drawString default-g2d (:text styled-text) x y)
@@ -280,6 +303,8 @@
 
 
 (defn line
+  "Draws line to default-g2d object. May be called with settings map to set shape settings. Settings will be restored to
+  default-shape-values after drawing"
   ([x1 y1 x2 y2]
    (.draw default-g2d (Line2D$Double. x1 y1 x2 y2)))
   ([x1 y1 x2 y2 settings]
@@ -289,13 +314,11 @@
   )
 
 (defn rectangle
-  ([x y w h]
-   (let [rectangle (Rectangle2D$Double. x y w h)]
-     (.draw default-g2d rectangle))
-    )
+  "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
+  default-shape-values after drawing"
   ([x y w h fill]
    (let [rectangle (Rectangle2D$Double. x y w h)]
-     (if (= fill :fill)
+     (if (= fill true)
        (.fill default-g2d rectangle)
        (.draw default-g2d rectangle))
      ))
@@ -304,13 +327,31 @@
    (rectangle x y w h fill)
    (reset-shape-settings)))
 
+
+(defn shape
+  "Draws shape object to default-g2d object. Can be called with shape settings map to overide defualt-shape-settings.
+  Shape settings will be restored when passed to function."
+  ([shape settings]
+   (set-shape-settings settings)
+   (.draw default-g2d shape)
+   (if (not-empty settings)
+     (reset-shape-settings))
+   ([shape]
+     (shape shape {})))
+  )
+
 (defn set-background [color]
-  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) :fill {:composite :src :color color}))
+  "Is called on create-image macro when background key in settings map is defiend"
+  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) true {:composite :src :color color}))
 
 (defn create-scaleOp [& rgba]
+  "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
   (RescaleOp. (float-array rgba) (float-array 4) nil))
 
 (defn image
+  "Draws a BufferedImage into default-image. Can be called with a settings map to define composite attribute.
+   Setting will be restored to default-shape-settings
+   May also scale image to fit into wanted area"
   ([x y img]
    (image x y img {}))
 
@@ -332,10 +373,14 @@
    (reset-shape-settings)))
 
 (defn load-image [source]
+  "Creates a BufferedImage from a defined source"
   (ImageIO/read (File. source)))
 
 
 (defn render-output
+  ":as --> :file; :path PATH = Renders the default-image and stores it a file at the defiend path
+  :as --> :show = Renders the default-image and displays it in a JFrame
+  :as --> :send = Renders the default-image and converts it to JSON"
   ([{:keys [as path clipping format]}]
    (if (= as :show)
      (do
@@ -345,12 +390,10 @@
    (render-output {:as :show}))
   )
 
-;aufruf nur aus macro "draw" möglich
-(defmacro transform [& functions])
-
 (defmacro create-image
-  "Creates an BufferedImage with given size."
   [w h & body]
+  "May be called with existing BufferedImage or with width and height argument to create a BufferedImage with given size.
+   Binds the the new image and its Graphics2D object to default-image and default-g2d."
   `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)]
      (binding [default-image image#
                default-g2d (.createGraphics image#)]
