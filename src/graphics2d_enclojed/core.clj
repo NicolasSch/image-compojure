@@ -8,6 +8,9 @@
            (java.io File)))
 
 
+(declare set-background)
+
+
 (defmacro when->
   "Similar to -> but checks logical truthiness of first form. Calls second form on object."
   {:added "1.0"}
@@ -29,8 +32,9 @@
         (recur threaded (next (next forms))))
       x)))
 
+
 (defn create-color
-  "Returns Java.awt.Color Object. Cann be called with key to get predefiend Java Colors or R G B a values 0-1"
+  "Returns Java.awt.Color Object. Can be called with key to get predefiend Java Colors or R G B a values 0-1"
   ([] (. Color Color/white))
   ([key] (cond
            (= key :green) (. Color Color/green)
@@ -45,10 +49,6 @@
   ([r g b] (Color. r g b 1))
   ([r g b a] (Color. r g b a)))
 
-
-
-;(def ^:dynamic default-g2d nil)
-;(def ^:dynamic default-image nil)
 
 (def ^:dynamic default-image (BufferedImage. 1920 1080 BufferedImage/TYPE_INT_ARGB))
 (def ^:dynamic default-g2d (.createGraphics default-image))
@@ -71,7 +71,8 @@
                               :interpolatioin       :bicubic
                               :rendering            :quality
                               :stroke-control       :normalize
-                              :text-antialiasing    :off})
+                              :text-antialiasing    :off
+                              :background           (create-color :white)})
 
 (def frame (proxy [JFrame] []
              (paint [#^Graphics g]
@@ -182,12 +183,17 @@
                              :lcd-vgbr (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR)})
 
 
+(defn create-image-from-file [source]
+  "Creates a BufferedImage from a defined source"
+  (ImageIO/read (File. source)))
+
+
+
 (defn create-font
   "Returns a logical Font which can be used on any Java platform. Font must be defiend in fonts map"
   ([name style size]
    (Font. (name fonts) (style font-styles) size)
     ))
-
 
 (defn create-styled-text [text {:keys [name style size weight width underline foreground background strike-through swap-colors kerning]}]
   "Creates a map containing the text which shall be drawn to the default-g2d object as String and a font defined by
@@ -212,6 +218,14 @@
         (assoc :font (.deriveFont font styled-font)))))
 
 
+(defn set-background [color]
+  "Is called on create-image macro when background key in settings map is defiend"
+  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) true {:composite :src :color color}))
+
+(defn create-scaleOp [& rgba]
+  "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
+  (RescaleOp. (float-array rgba) (float-array 4) nil))
+
 (defn set-stroke
   "Sets stroke attributes on default-g2d object"
   [width cap join miter-limit dash dash-phase]
@@ -230,6 +244,31 @@
   "Sets composite attribute on default-g2d object"
   (let [alpha-composite (. AlphaComposite getInstance (comp composite-rules) alpha)]
     (.setComposite default-g2d alpha-composite)))
+
+(defn set-rendering-hints
+  "Is called on create-image macro to set renderinghints on default-g2d object"
+  [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing background] :or
+          {antialiasing         :off
+           aplpha-interpolation :default
+           color-rendering      :quality
+           dithering            :disable
+           fractional-metrics   :on
+           interpolatioin       :bicubic
+           rendering            :quality
+           stroke-control       :normalize
+           text-antialiasing    :off}}]
+  (let [rendering-hints {(RenderingHints/KEY_ANTIALIASING)        (antialiasing keys-antialiasing)
+                         (RenderingHints/KEY_ALPHA_INTERPOLATION) (aplpha-interpolation keys-alpha-interpolation)
+                         (RenderingHints/KEY_COLOR_RENDERING)     (color-rendering keys-color-rendering)
+                         (RenderingHints/KEY_DITHERING)           (dithering keys-dithering)
+                         (RenderingHints/KEY_FRACTIONALMETRICS)   (fractional-metrics keys-fractional-metrics)
+                         (RenderingHints/KEY_INTERPOLATION)       (interpolatioin keys-interpolation)
+                         (RenderingHints/KEY_RENDERING)           (rendering keys-rendering)
+                         (RenderingHints/KEY_STROKE_CONTROL)      (stroke-control keys-stroke-control)
+                         (RenderingHints/KEY_TEXT_ANTIALIASING)   (text-antialiasing keys-text-antialiasing)}]
+    (.setRenderingHints default-g2d rendering-hints)
+    (if background
+      (set-background background))))
 
 (defn set-shape-settings
   "Sets attributes for stroke color and composite to default-g2d object."
@@ -259,28 +298,6 @@
   "Calls on set-shape-settings to reset shape-settings back to defined default-shape-settings"
   (set-shape-settings))
 
-(defn set-rendering-hints
-  "Is called on create-image macro to set renderinghints on default-g2d object"
-  [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing] :or
-                                  {antialiasing         :off
-                                   aplpha-interpolation :default
-                                   color-rendering      :quality
-                                   dithering            :disable
-                                   fractional-metrics   :on
-                                   interpolatioin       :bicubic
-                                   rendering            :quality
-                                   stroke-control       :normalize
-                                   text-antialiasing    :off}}]
-  (let [rendering-hints {(RenderingHints/KEY_ANTIALIASING)        (antialiasing keys-antialiasing)
-                         (RenderingHints/KEY_ALPHA_INTERPOLATION) (aplpha-interpolation keys-alpha-interpolation)
-                         (RenderingHints/KEY_COLOR_RENDERING)     (color-rendering keys-color-rendering)
-                         (RenderingHints/KEY_DITHERING)           (dithering keys-dithering)
-                         (RenderingHints/KEY_FRACTIONALMETRICS)   (fractional-metrics keys-fractional-metrics)
-                         (RenderingHints/KEY_INTERPOLATION)       (interpolatioin keys-interpolation)
-                         (RenderingHints/KEY_RENDERING)           (rendering keys-rendering)
-                         (RenderingHints/KEY_STROKE_CONTROL)      (stroke-control keys-stroke-control)
-                         (RenderingHints/KEY_TEXT_ANTIALIASING)   (text-antialiasing keys-text-antialiasing)}]
-    (.setRenderingHints default-g2d rendering-hints)))
 
 (defn repaint []
   "Repaint default-image in displayed JFrame"
@@ -327,6 +344,25 @@
    (rectangle x y w h fill)
    (reset-shape-settings)))
 
+(defn polygon
+  "Draws a polygon to the default-g2d object. May be called with shape settings. Settings will be resetted after drawing process.
+  Takes a polygon shape object or sequences of x, y coordinates and the number of points the polygon consists of"
+
+  ([polygon fill]
+   (if fill (.drawPolygon default-g2d polygon)
+            (.fillPolygon default-g2d polygon)))
+  ([polygon fill settings]
+   (set-shape-settings settings)
+   (polygon polygon fill)
+   (reset-shape-settings))
+  ([x y count fill]
+   (if fill (.drawPolygon default-g2d x y count)
+            (.fillPolygon default-g2d x y count)))
+  ([x y count fill settings]
+   (set-shape-settings settings)
+   (polygon x y count fill)
+   (reset-shape-settings)))
+
 
 (defn shape
   "Draws shape object to default-g2d object. Can be called with shape settings map to overide defualt-shape-settings.
@@ -339,14 +375,6 @@
    ([shape]
      (shape shape {})))
   )
-
-(defn set-background [color]
-  "Is called on create-image macro when background key in settings map is defiend"
-  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) true {:composite :src :color color}))
-
-(defn create-scaleOp [& rgba]
-  "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
-  (RescaleOp. (float-array rgba) (float-array 4) nil))
 
 (defn image
   "Draws a BufferedImage into default-image. Can be called with a settings map to define composite attribute.
@@ -372,11 +400,6 @@
    (.drawImage default-g2d x1dest y1dest x2dest y2dest x1src y1src x2src y2src img nil)
    (reset-shape-settings)))
 
-(defn load-image [source]
-  "Creates a BufferedImage from a defined source"
-  (ImageIO/read (File. source)))
-
-
 (defn render-output
   ":as --> :file; :path PATH = Renders the default-image and stores it a file at the defiend path
   :as --> :show = Renders the default-image and displays it in a JFrame
@@ -390,15 +413,24 @@
    (render-output {:as :show}))
   )
 
-(defmacro create-image
-  [w h & body]
+(defmacro compose
+  [w h settings & body]
   "May be called with existing BufferedImage or with width and height argument to create a BufferedImage with given size.
    Binds the the new image and its Graphics2D object to default-image and default-g2d."
   `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)]
      (binding [default-image image#
-               default-g2d (.createGraphics image#)]
+               default-g2d (.createGraphics image#)
+               default-render-settings ~(merge default-render-settings settings)]
        (set-rendering-hints ~default-render-settings)
        (do ~@body))))
+
+(defmacro draw
+  [settings & body]
+  `(binding [default-shape-values ~(merge default-shape-values settings)]
+     (do
+       (set-shape-settings)
+       ~@body
+       (reset-shape-settings))))
 
 
 
@@ -432,13 +464,9 @@
 
 (defn hit [x1 y1 x2 y2])
 
-(defn write-string! [bufferedImage x1 y1 x2 y2 text])
-
 (defn ellipse [bufferedImage x1 y1 x2 y2 options])
 
 (defn polygone [bufferedImage points options])
-
-(defn generalpath [bufferedImage functions options])
 
 
 
