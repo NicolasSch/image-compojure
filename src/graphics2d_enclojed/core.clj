@@ -1,5 +1,5 @@
 (ns graphics2d-enclojed.core
-  (:import (java.awt Color Font Graphics Graphics2D Dimension Composite BasicStroke RenderingHints AlphaComposite)
+  (:import (java.awt Color Font Graphics Graphics2D Dimension Composite BasicStroke RenderingHints AlphaComposite Polygon)
            (java.awt.font TextAttribute)
            (java.awt.image BufferedImage RescaleOp)
            (javax.swing JFrame)
@@ -9,7 +9,20 @@
 
 
 (declare set-background)
+(declare set-shape-settings)
+(declare reset-shape-settings)
 
+
+(defmacro draw-fill-reset
+  "Convenience macro not to call set-shape-setting and reset-shape-settings everytime a shape was drawn to default-g2d-object."
+  [settings & body]
+  (if (not-empty settings)
+    `(do
+       (set-shape-settings ~'settings)
+       ~@body
+       (reset-shape-settings))
+    `(do ~@body))
+  )
 
 (defmacro when->
   "Similar to -> but checks logical truthiness of first form. Calls second form on object."
@@ -282,7 +295,6 @@
                   (float-array dash)
                   (:dash default-shape-values))
            dash-phase (or dash-phase (:dash-phase default-shape-values))]
-       (println width cap join miter-limit dash dash-phase composite alpha color)
        (set-stroke width cap join miter-limit dash dash-phase)
        ))
    (if color
@@ -344,24 +356,20 @@
    (rectangle x y w h fill)
    (reset-shape-settings)))
 
+
 (defn polygon
   "Draws a polygon to the default-g2d object. May be called with shape settings. Settings will be resetted after drawing process.
-  Takes a polygon shape object or sequences of x, y coordinates and the number of points the polygon consists of"
-
-  ([polygon fill]
-   (if fill (.drawPolygon default-g2d polygon)
-            (.fillPolygon default-g2d polygon)))
-  ([polygon fill settings]
-   (set-shape-settings settings)
-   (polygon polygon fill)
-   (reset-shape-settings))
-  ([x y count fill]
-   (if fill (.drawPolygon default-g2d x y count)
-            (.fillPolygon default-g2d x y count)))
-  ([x y count fill settings]
-   (set-shape-settings settings)
-   (polygon x y count fill)
-   (reset-shape-settings)))
+  Takes sequences of x, y coordinates and the number of points the polygon consists of"
+  ([x y fill settings]
+   (if-not (= (count x) (count y))
+     (throw (RuntimeException.
+              "Number of x and y coordinates must be equal")))
+   (draw-fill-reset (eval settings)
+                    (if fill
+                      (.drawPolygon default-g2d (int-array x) (int-array y) (count x))
+                      (.fillPolygon default-g2d x y (count x)))))
+  ([x y fill]
+   (polygon x y fill {})))
 
 
 (defn shape
@@ -379,26 +387,24 @@
 (defn image
   "Draws a BufferedImage into default-image. Can be called with a settings map to define composite attribute.
    Setting will be restored to default-shape-settings
-   May also scale image to fit into wanted area"
+   May also scale image to fit into wanted area.
+   Settings attribute :filter takes an ScaleOp Object which can be defined by function create-scaleop"
   ([x y img]
    (image x y img {}))
 
   ([x y img settings]
-   (if (:composite settings)
-     (set-shape-settings settings))
-   (if filter
-     (.drawImage default-g2d img (:filter settings) x y)
-     (.drawImage default-g2d img x y nil))
-   (reset-shape-settings))
+   (let [filter (:filter settings)]
+     (draw-fill-reset (eval settings)
+                      (if filter
+                        (.drawImage default-g2d img filter x y)
+                        (.drawImage default-g2d img x y nil)))))
 
   ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src]
    (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img {}))
 
   ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings]
-   (if (:composite settings)
-     (set-shape-settings settings))
-   (.drawImage default-g2d x1dest y1dest x2dest y2dest x1src y1src x2src y2src img nil)
-   (reset-shape-settings)))
+   (draw-fill-reset (eval settings)
+                    (.drawImage default-g2d x1dest y1dest x2dest y2dest x1src y1src x2src y2src img nil))))
 
 (defn render-output
   ":as --> :file; :path PATH = Renders the default-image and stores it a file at the defiend path
@@ -433,40 +439,6 @@
        (reset-shape-settings))))
 
 
-
-;bufferedImage erstellen
-;functionen drauf anwenden
-
-(defmacro transform-with-settings [])
-
-(defmacro draw-with-settings [bufferedImage options & functions]
-  ;functionen drauf anwenden
-  ())
-
-
-;transformation
-(defn shear [num num])
-
-(defn tranlate [x y])
-
-(defn scale [num num]
-  )
-
-(defn rotate
-  ([num])
-  ([num, x, y]))
-
-(defn rotate [num])
-
-(defn crop [image method & size])
-
-(defn resize [h w])
-
-(defn hit [x1 y1 x2 y2])
-
-(defn ellipse [bufferedImage x1 y1 x2 y2 options])
-
-(defn polygone [bufferedImage points options])
 
 
 
