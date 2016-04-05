@@ -1,4 +1,4 @@
-(ns graphics2d-enclojed.unittest)
+(ns image-compose.unittest)
 (:require [graphics2d-enclojed.core :refer :all])
 
 (defn draw-polygone

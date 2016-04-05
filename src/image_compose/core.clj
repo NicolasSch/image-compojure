@@ -1,14 +1,16 @@
-(ns graphics2d-enclojed.core
+(ns image-compose.core
+  (:require [clojure.data.codec.base64 :as b64])
   (:import (java.awt Color Font Graphics Graphics2D Dimension Composite BasicStroke RenderingHints AlphaComposite Polygon)
            (java.awt.font TextAttribute)
            (java.awt.image BufferedImage RescaleOp)
            (javax.swing JFrame)
            (java.awt.geom Rectangle2D$Double Line2D$Double AffineTransform GeneralPath)
            (javax.imageio ImageIO)
-           (java.io File)))
+           (java.io File ByteArrayOutputStream)))
 
 
 (declare set-background)
+(declare rectangle)
 (declare set-shape-settings)
 (declare reset-shape-settings)
 
@@ -25,7 +27,7 @@
   )
 
 (defmacro when->
-  "Similar to -> but checks logical truthiness of first form. Calls second form on object."
+  "Similar to -> but checks logical truth of first form. Calls second form on object."
   {:added "1.0"}
   [x & forms]
   (if-not (= 0 (mod (count forms) 2))
@@ -50,14 +52,17 @@
   "Returns Java.awt.Color Object. Can be called with key to get predefiend Java Colors or R G B a values 0-1"
   ([] (. Color Color/white))
   ([key] (cond
-           (= key :green) (. Color Color/green)
-           (= key :blue) (. Color Color/blue)
-           (= key :red) (. Color Color/red)
-           (= key :black) (. Color Color/black)
-           (= key :yellow) (. Color Color/yellow)
-           (= key :pink) (. Color Color/pink)
-           (= key :orange) (. Color Color/orange)
-           (= key :blue) (. Color Color/blue)
+           (= key :green) (. Color Color/GREEN)
+           (= key :blue) (. Color Color/BLUE)
+           (= key :red) (. Color Color/RED)
+           (= key :black) (. Color Color/BLACK)
+           (= key :yellow) (. Color Color/YELLOW)
+           (= key :pink) (. Color Color/PINK)
+           (= key :orange) (. Color Color/ORANGE)
+           (= key :magenta) (. Color Color/MAGENTA)
+           (= key :light-grey) (. Color Color/LIGHT_GRAY)
+           (= key :dark-gray) (. Color Color/DARK_GRAY)
+           (= key :cyan) (. Color Color/CYAN)
            ))
   ([r g b] (Color. r g b 1))
   ([r g b a] (Color. r g b a)))
@@ -196,11 +201,9 @@
                              :lcd-vgbr (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR)})
 
 
-(defn create-image-from-file [source]
+(defn load-image [source]
   "Creates a BufferedImage from a defined source"
   (ImageIO/read (File. source)))
-
-
 
 (defn create-font
   "Returns a logical Font which can be used on any Java platform. Font must be defiend in fonts map"
@@ -211,10 +214,10 @@
 (defn create-styled-text [text {:keys [name style size weight width underline foreground background strike-through swap-colors kerning]}]
   "Creates a map containing the text which shall be drawn to the default-g2d object as String and a font defined by
   FontfamilyName, Style, Size and Textattributes
-  For available FontFamilys and styles see defiend maps fonts and font-styles
+  For available FontFamilys and styles see defiend maps 'fonts' and 'font-styles'
   Available Textatrributes can be seen in maps: text-weight, text-width, text-posture, text-underline.
-  Furthermore font can be defient by the keys: :kerning bool, :swap-colors bool , :foreground Color, :background Color,
-  :name String(FontFamilyName), style"
+  Furthermore fonts can be defiend by the keys: :kerning bool, :swap-colors bool , :foreground Color, :background Color,
+  :name String(FontFamilyName), style int"
   (let [font (create-font name style size)
         styled-font (when-> {}
                             kerning (assoc (TextAttribute/KERNING) (TextAttribute/KERNING_ON))
@@ -230,14 +233,13 @@
         (assoc :text text)
         (assoc :font (.deriveFont font styled-font)))))
 
-
-(defn set-background [color]
-  "Is called on create-image macro when background key in settings map is defiend"
-  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) true {:composite :src :color color}))
-
 (defn create-scaleOp [& rgba]
   "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
   (RescaleOp. (float-array rgba) (float-array 4) nil))
+
+(defn set-background [color]
+  "Is called on compose macro when background key in settings map is defiend"
+  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) true {:composite :src :color color}))
 
 (defn set-stroke
   "Sets stroke attributes on default-g2d object"
@@ -259,7 +261,7 @@
     (.setComposite default-g2d alpha-composite)))
 
 (defn set-rendering-hints
-  "Is called on create-image macro to set renderinghints on default-g2d object"
+  "Is called on compose macro to set renderinghints on default-g2d object"
   [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing background] :or
           {antialiasing         :off
            aplpha-interpolation :default
@@ -284,7 +286,7 @@
       (set-background background))))
 
 (defn set-shape-settings
-  "Sets attributes for stroke color and composite to default-g2d object."
+  "Sets attributes for stroke, color and composite to default-g2d object."
   ([{:keys [width cap join miter-limit dash dash-phase composite alpha color]}]
    (if (or width cap join miter-limit dash dash-phase)
      (let [width (or width (:width default-shape-values))
@@ -344,7 +346,7 @@
 
 (defn rectangle
   "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
-  default-shape-values after drawing"
+  default-shape-values after drawing process finished."
   ([x y w h fill]
    (let [rectangle (Rectangle2D$Double. x y w h)]
      (if (= fill true)
@@ -357,8 +359,20 @@
    (reset-shape-settings)))
 
 
+(defn oval
+  "Draws an oval to default-g2d-object. May be called with settings map to set shape settings. Settings will be restored to
+  default-shape-values after drawing process finished."
+  ([x y w h fill settings]
+   (draw-fill-reset (eval settings)
+                    (if fill
+                      (.fillOval default-g2d x y w h)
+                      (.drawOval default-g2d x y w h))))
+  ([x y w h fill]
+   (oval x y w h fill {})))
+
+
 (defn polygon
-  "Draws a polygon to the default-g2d object. May be called with shape settings. Settings will be resetted after drawing process.
+  "Draws a polygon to the default-g2d object. May be called with shape settings. Settings will be restored after drawing process.
   Takes sequences of x, y coordinates and the number of points the polygon consists of"
   ([x y fill settings]
    (if-not (= (count x) (count y))
@@ -375,14 +389,14 @@
 (defn shape
   "Draws shape object to default-g2d object. Can be called with shape settings map to overide defualt-shape-settings.
   Shape settings will be restored when passed to function."
-  ([shape settings]
-   (set-shape-settings settings)
-   (.draw default-g2d shape)
-   (if (not-empty settings)
-     (reset-shape-settings))
-   ([shape]
-     (shape shape {})))
-  )
+  ([shape fill settings]
+   (draw-fill-reset (eval settings)
+                    (if fill
+                      (.fill default-g2d shape)
+                      (.draw default-g2d shape))))
+  ([shape fill]
+   (shape shape fill {})))
+
 
 (defn image
   "Draws a BufferedImage into default-image. Can be called with a settings map to define composite attribute.
@@ -406,15 +420,37 @@
    (draw-fill-reset (eval settings)
                     (.drawImage default-g2d x1dest y1dest x2dest y2dest x1src y1src x2src y2src img nil))))
 
+(defn save-image [path]
+  "Stores default-image into file. Available formats are gif jpeg and png"
+  (let [file (File. path)
+        format (last (clojure.string/split path #"\."))]
+    (ImageIO/write default-image format file)))
+
+(defn to-json
+  "Converts default-iamge to Base64 JSON"
+  []
+  (let [baos (new ByteArrayOutputStream)]
+    (ImageIO/write default-image "jpeg" baos)
+    (let [bytes (.toByteArray baos)]
+      (clojure.string/replace (String. (b64/encode bytes)) #"\+|/" {"+" "-" "/" "_"}))
+    ))
+
 (defn render-output
-  ":as --> :file; :path PATH = Renders the default-image and stores it a file at the defiend path
+  ":as --> :file; :path PATH = Renders the default-image and stores it as file to the defiend path
   :as --> :show = Renders the default-image and displays it in a JFrame
-  :as --> :send = Renders the default-image and converts it to JSON"
-  ([{:keys [as path clipping format]}]
+  :as --> :json = Renders the default-image and converts it to JSON"
+  ([{:keys [as path clipping]}]
    (if (= as :show)
      (do
        (println "Das Bild wird nun in einem JFrame in der größe des BufferedImage angezeigt")
-       (show-image))))
+       (show-image)))
+   (if (= as :file)
+     (do
+       (println (str "Saved image to " path))
+       (save-image path)))
+   (if (= as :json)
+     (do
+       (to-json))))
   ([]
    (render-output {:as :show}))
   )

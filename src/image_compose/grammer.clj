@@ -1,4 +1,4 @@
-(ns graphics2d-enclojed.grammer
+(ns image-compose.grammer
   (:import (java.awt Color Font)
            (java.awt.image BufferedImage)))
 

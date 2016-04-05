@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/graphics2d-enclojed.iml" filepath="$PROJECT_DIR$/graphics2d-enclojed.iml" />
+      <module fileurl="file://$PROJECT_DIR$/image-compose.iml" filepath="$PROJECT_DIR$/image-compose.iml" />
     </modules>
   </component>
 </project>
