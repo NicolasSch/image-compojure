@@ -1,6 +1,7 @@
 (ns image-compose.grammer
   (:import (java.awt Color Font)
-           (java.awt.image BufferedImage)))
+           (java.awt.image BufferedImage))
+  (:require [image-compose.core :as img]))
 
 
 
@@ -14,7 +15,7 @@
 
 ;1. und 2. Argument optional
 
-(create-image (load-image {:size (resize 600 400)
+(img/compose (load-image {:size (resize 600 400)
                            :source    "src/test.png"
                            :composite :destination})
               {

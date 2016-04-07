@@ -18,12 +18,12 @@
 (defmacro draw-fill-reset
   "Convenience macro not to call set-shape-setting and reset-shape-settings everytime a shape was drawn to default-g2d-object."
   [settings & body]
-  (if (not-empty settings)
-    `(do
-       (set-shape-settings ~'settings)
+  `(if (not-empty ~settings)
+     (do
+       (set-shape-settings ~settings)
        ~@body
        (reset-shape-settings))
-    `(do ~@body))
+     (do ~@body))
   )
 
 (defmacro when->
@@ -310,19 +310,9 @@
 
 (defn reset-shape-settings []
   "Calls on set-shape-settings to reset shape-settings back to defined default-shape-settings"
+  (println "Reset shape settings")
   (set-shape-settings))
 
-
-(defn repaint []
-  "Repaint default-image in displayed JFrame"
-  (.repaint frame))
-
-(defn show-image []
-  "Show default-image in Jframe"
-  (let [dimensison (Dimension. (.getWidth default-image) (.getHeight default-image))]
-    (doto frame
-      (.setSize dimensison)
-      (.setVisible true))))
 
 (defn styled-text [x y styled-text]
   "Draws previously created styledtext map to default-g2d object"
@@ -336,34 +326,52 @@
 (defn line
   "Draws line to default-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing"
-  ([x1 y1 x2 y2]
-   (.draw default-g2d (Line2D$Double. x1 y1 x2 y2)))
   ([x1 y1 x2 y2 settings]
-   (set-shape-settings settings)
-   (line x1 y1 x2 y2)
-   (reset-shape-settings))
-  )
+   (draw-fill-reset settings
+                    (.drawLine default-g2d x1 y1 x2 y2)
+                    ))
+  ([x1 y1 x2 y2]
+   (line x1 y1 x2 y2 {})))
+
+(defn polyline
+  "Draws multiple lines to default-g2d object. May be called with settings map to set shape settings. Settings will be restored to
+  default-shape-values after drawing.
+  Takes a sequnce for x and y coordinates a the number of lines"
+  ([x y number settings]
+   (draw-fill-reset settings
+                    (.drawPolyline default-g2d x y number)))
+  ([x y number]
+   (polyline x y number {})))
+
 
 (defn rectangle
   "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
-  ([x y w h fill]
-   (let [rectangle (Rectangle2D$Double. x y w h)]
-     (if (= fill true)
-       (.fill default-g2d rectangle)
-       (.draw default-g2d rectangle))
-     ))
   ([x y w h fill settings]
-   (set-shape-settings settings)
-   (rectangle x y w h fill)
-   (reset-shape-settings)))
+   (draw-fill-reset settings
+                    (if fill
+                      (.fillRect default-g2d x y w h)
+                      (.drawRect default-g2d x y w h))))
+  ([x y w h fill]
+   (rectangle x y w h {})))
+
+(defn round-rectangle
+  "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
+  default-shape-values after drawing process finished."
+  ([x y w h arcW arcH fill settings]
+   (draw-fill-reset settings
+                    (if fill
+                      (.fillRoundRect default-g2d x y w h arcW arcH)
+                      (.drawRoundRect default-g2d x y w h arcW arcH))))
+  ([x y w h arcW arcH fill]
+   (round-rectangle x y w h arcW arcH fill {})))
 
 
 (defn oval
   "Draws an oval to default-g2d-object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
   ([x y w h fill settings]
-   (draw-fill-reset (eval settings)
+   (draw-fill-reset settings
                     (if fill
                       (.fillOval default-g2d x y w h)
                       (.drawOval default-g2d x y w h))))
@@ -373,12 +381,12 @@
 
 (defn polygon
   "Draws a polygon to the default-g2d object. May be called with shape settings. Settings will be restored after drawing process.
-  Takes sequences of x, y coordinates and the number of points the polygon consists of"
+  Takes sequences of x, y coordinates and number of points the polygon consists of"
   ([x y fill settings]
    (if-not (= (count x) (count y))
      (throw (RuntimeException.
               "Number of x and y coordinates must be equal")))
-   (draw-fill-reset (eval settings)
+   (draw-fill-reset settings
                     (if fill
                       (.drawPolygon default-g2d (int-array x) (int-array y) (count x))
                       (.fillPolygon default-g2d x y (count x)))))
@@ -386,16 +394,16 @@
    (polygon x y fill {})))
 
 
-(defn shape
+(defn shapes
   "Draws shape object to default-g2d object. Can be called with shape settings map to overide defualt-shape-settings.
   Shape settings will be restored when passed to function."
-  ([shape fill settings]
-   (draw-fill-reset (eval settings)
+  ([shapes-vec fill settings]
+   (draw-fill-reset settings
                     (if fill
-                      (.fill default-g2d shape)
-                      (.draw default-g2d shape))))
-  ([shape fill]
-   (shape shape fill {})))
+                      (dorun (map #(.fill default-g2d %1) shapes-vec))
+                      (dorun (map #(.draw default-g2d %1) shapes-vec)))))
+  ([shapes-vec fill]
+   (shapes shapes-vec fill {})))
 
 
 (defn image
@@ -408,7 +416,7 @@
 
   ([x y img settings]
    (let [filter (:filter settings)]
-     (draw-fill-reset (eval settings)
+     (draw-fill-reset settings
                       (if filter
                         (.drawImage default-g2d img filter x y)
                         (.drawImage default-g2d img x y nil)))))
@@ -417,7 +425,7 @@
    (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img {}))
 
   ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings]
-   (draw-fill-reset (eval settings)
+   (draw-fill-reset settings
                     (.drawImage default-g2d x1dest y1dest x2dest y2dest x1src y1src x2src y2src img nil))))
 
 (defn save-image [path]
@@ -434,6 +442,17 @@
     (let [bytes (.toByteArray baos)]
       (clojure.string/replace (String. (b64/encode bytes)) #"\+|/" {"+" "-" "/" "_"}))
     ))
+
+(defn show-image []
+  "Show default-image in Jframe"
+  (let [dimensison (Dimension. (.getWidth default-image) (.getHeight default-image))]
+    (doto frame
+      (.setSize dimensison)
+      (.setVisible true))))
+
+(defn repaint []
+  "Repaint default-image in displayed JFrame"
+  (.repaint frame))
 
 (defn render-output
   ":as --> :file; :path PATH = Renders the default-image and stores it as file to the defiend path
