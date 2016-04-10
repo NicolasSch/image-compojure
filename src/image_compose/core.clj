@@ -9,11 +9,7 @@
            (java.io File ByteArrayOutputStream)))
 
 
-(declare set-background)
-(declare rectangle)
-(declare set-shape-settings)
-(declare reset-shape-settings)
-
+(declare set-background rectangle set-shape-settings reset-shape-settings)
 
 (defmacro draw-fill-reset
   "Convenience macro not to call set-shape-setting and reset-shape-settings everytime a shape was drawn to default-g2d-object."
@@ -49,7 +45,7 @@
 
 
 (defn create-color
-  "Returns Java.awt.Color Object. Can be called with key to get predefiend Java Colors or R G B a values 0-1"
+  "Returns Java.awt.Color object. Can be called with key to get predefiend Java Colors or R G B a values 0-1"
   ([] (. Color Color/white))
   ([key] (cond
            (= key :green) (. Color Color/GREEN)
@@ -80,6 +76,8 @@
                                      :alpha       1.0
                                      :color       (create-color :black)
                                      })
+
+(def affine-transform (AffineTransform.))
 
 (def default-render-settings {:antialiasing         :off
                               :aplpha-interpolation :default
@@ -200,7 +198,56 @@
                              :lcd-vrgb (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VRGB)
                              :lcd-vgbr (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR)})
 
+(defn set-transform
+  [trans]
+  (.setTransform default-g2d trans))
 
+(defn concat-transforms
+  ([at new-at]
+   (.concatenate at new-at)
+   at))
+
+(defn translate
+  ([at x y]
+   (.translate at x y) at))
+
+(defn shear
+  ([at shx shy]
+   (.shear at shx shy) at))
+
+(defn rotate
+  ([at theta]
+   (.rotate at theta) at)
+  ([at vecx vecy]
+   (.rotate at vecx vecy) at)
+  ([at theta anchorx anchory]
+   (.rotate at theta anchorx anchory) at)
+  ([at vecx vecy anchorx anchory]
+   (.rotate at vecx vecy anchorx anchory) at))
+
+(defn scale
+  [at scalex scaley]
+  (.scale at scalex scaley) at)
+
+(defmacro create-transform
+  ([& forms]
+   `(let [at# (AffineTransform.)]
+      (-> at#
+          ~@forms))))
+
+(defmacro with-transform
+  ""
+  ([trans & forms]
+   `(let [current-trans# (.getTransform default-g2d)
+          ;wieso scheine ich current-trans nicht in der nachfolgenden zeile verwenden zu können????
+          ;testen ob weglassen... transform concates von sich aus?
+          new-trans# (concat-transforms (.getTransform default-g2d) ~trans)]
+      (do
+        (.transform default-g2d new-trans#)
+        ~@forms
+        (set-transform current-trans#))
+      ))
+  )
 (defn load-image [source]
   "Creates a BufferedImage from a defined source"
   (ImageIO/read (File. source)))
@@ -233,7 +280,7 @@
         (assoc :text text)
         (assoc :font (.deriveFont font styled-font)))))
 
-(defn create-scaleOp [& rgba]
+(defn create-scale-opp [& rgba]
   "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
   (RescaleOp. (float-array rgba) (float-array 4) nil))
 
@@ -310,7 +357,6 @@
 
 (defn reset-shape-settings []
   "Calls on set-shape-settings to reset shape-settings back to defined default-shape-settings"
-  (println "Reset shape settings")
   (set-shape-settings))
 
 
@@ -354,6 +400,7 @@
                       (.drawRect default-g2d x y w h))))
   ([x y w h fill]
    (rectangle x y w h {})))
+
 
 (defn round-rectangle
   "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
@@ -400,8 +447,8 @@
   ([shapes-vec fill settings]
    (draw-fill-reset settings
                     (if fill
-                      (dorun (map #(.fill default-g2d %1) shapes-vec))
-                      (dorun (map #(.draw default-g2d %1) shapes-vec)))))
+                      (doseq [shape-obj shapes-vec] (.fill default-g2d shape-obj))
+                      (doseq [shape-obj shapes-vec] (.draw default-g2d shape-obj)))))
   ([shapes-vec fill]
    (shapes shapes-vec fill {})))
 
@@ -492,8 +539,3 @@
        (set-shape-settings)
        ~@body
        (reset-shape-settings))))
-
-
-
-
-
