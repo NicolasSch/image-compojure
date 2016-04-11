@@ -49,8 +49,8 @@ With-Transfomr Macro
 Output
     - In Frame anzeigen --> erledigt
     - neu zeichnen --> erledigt
-    - In Datei speichern
-    - Nach JSON exportieren
+    - In Datei speichern --> erledigt
+    - Nach JSON exportieren --> erledigt
 
 
 

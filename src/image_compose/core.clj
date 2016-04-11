@@ -44,7 +44,7 @@
       x)))
 
 
-(defn create-color
+(defn color
   "Returns Java.awt.Color object. Can be called with key to get predefiend Java Colors or R G B a values 0-1"
   ([] (. Color Color/white))
   ([key] (cond
@@ -72,27 +72,23 @@
                                      :cap         :square
                                      :dash        nil
                                      :dash-phase  0
-                                     :composite   :src
+                                     :composite   :src_over
                                      :alpha       1.0
-                                     :color       (create-color :black)
+                                     :color       '(color :black)
                                      })
 
-(def affine-transform (AffineTransform.))
+(def ^:dynamic default-render-settings {:antialiasing         :off
+                                        :aplpha-interpolation :default
+                                        :color-rendering      :quality
+                                        :dithering            :disable
+                                        :fractional-metrics   :on
+                                        :interpolatioin       :bicubic
+                                        :rendering            :default
+                                        :stroke-control       :default
+                                        :text-antialiasing    :default
+                                        })
 
-(def default-render-settings {:antialiasing         :off
-                              :aplpha-interpolation :default
-                              :color-rendering      :quality
-                              :dithering            :disable
-                              :fractional-metrics   :on
-                              :interpolatioin       :bicubic
-                              :rendering            :quality
-                              :stroke-control       :normalize
-                              :text-antialiasing    :off
-                              :background           (create-color :white)})
 
-(def frame (proxy [JFrame] []
-             (paint [#^Graphics g]
-               (.drawImage g default-image 0 0 nil))))
 
 
 
@@ -229,7 +225,7 @@
   [at scalex scaley]
   (.scale at scalex scaley) at)
 
-(defmacro create-transform
+(defmacro transform
   ([& forms]
    `(let [at# (AffineTransform.)]
       (-> at#
@@ -258,7 +254,7 @@
    (Font. (name fonts) (style font-styles) size)
     ))
 
-(defn create-styled-text [text {:keys [name style size weight width underline foreground background strike-through swap-colors kerning]}]
+(defn create-styled-text [text name style size {:keys [weight width underline foreground background strike-through swap-colors kerning]}]
   "Creates a map containing the text which shall be drawn to the default-g2d object as String and a font defined by
   FontfamilyName, Style, Size and Textattributes
   For available FontFamilys and styles see defiend maps 'fonts' and 'font-styles'
@@ -280,7 +276,7 @@
         (assoc :text text)
         (assoc :font (.deriveFont font styled-font)))))
 
-(defn create-scale-opp [& rgba]
+(defn create-scale-op [& rgba]
   "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
   (RescaleOp. (float-array rgba) (float-array 4) nil))
 
@@ -309,26 +305,21 @@
 
 (defn set-rendering-hints
   "Is called on compose macro to set renderinghints on default-g2d object"
-  [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing background] :or
-          {antialiasing         :off
-           aplpha-interpolation :default
-           color-rendering      :quality
-           dithering            :disable
-           fractional-metrics   :on
-           interpolatioin       :bicubic
-           rendering            :quality
-           stroke-control       :normalize
-           text-antialiasing    :off}}]
-  (let [rendering-hints {(RenderingHints/KEY_ANTIALIASING)        (antialiasing keys-antialiasing)
-                         (RenderingHints/KEY_ALPHA_INTERPOLATION) (aplpha-interpolation keys-alpha-interpolation)
-                         (RenderingHints/KEY_COLOR_RENDERING)     (color-rendering keys-color-rendering)
-                         (RenderingHints/KEY_DITHERING)           (dithering keys-dithering)
-                         (RenderingHints/KEY_FRACTIONALMETRICS)   (fractional-metrics keys-fractional-metrics)
-                         (RenderingHints/KEY_INTERPOLATION)       (interpolatioin keys-interpolation)
-                         (RenderingHints/KEY_RENDERING)           (rendering keys-rendering)
-                         (RenderingHints/KEY_STROKE_CONTROL)      (stroke-control keys-stroke-control)
-                         (RenderingHints/KEY_TEXT_ANTIALIASING)   (text-antialiasing keys-text-antialiasing)}]
+  [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing background]}]
+  (let [rendering-hints (when-> {}
+                                antialiasing (assoc (RenderingHints/KEY_ANTIALIASING) (antialiasing keys-antialiasing))
+                                aplpha-interpolation (assoc (RenderingHints/KEY_ALPHA_INTERPOLATION) (aplpha-interpolation keys-alpha-interpolation))
+                                color-rendering (assoc (RenderingHints/KEY_COLOR_RENDERING) (color-rendering keys-color-rendering))
+                                dithering (assoc (RenderingHints/KEY_DITHERING) (dithering keys-dithering))
+                                fractional-metrics (assoc (RenderingHints/KEY_FRACTIONALMETRICS) (fractional-metrics keys-fractional-metrics))
+                                interpolatioin (assoc (RenderingHints/KEY_INTERPOLATION) (interpolatioin keys-interpolation))
+                                rendering (assoc (RenderingHints/KEY_RENDERING) (rendering keys-rendering))
+                                stroke-control (assoc (RenderingHints/KEY_STROKE_CONTROL) (stroke-control keys-stroke-control))
+                                text-antialiasing (assoc (RenderingHints/KEY_TEXT_ANTIALIASING) (text-antialiasing keys-text-antialiasing)))]
+    (println antialiasing)
+    (println (str "before " rendering-hints))
     (.setRenderingHints default-g2d rendering-hints)
+    (println (str "after " (.getRenderingHints default-g2d)))
     (if background
       (set-background background))))
 
@@ -347,7 +338,7 @@
        (set-stroke width cap join miter-limit dash dash-phase)
        ))
    (if color
-     (set-color color))
+     (do (set-color (eval color))))
    (if composite
      (let [alpha (or alpha (:alpha default-shape-values))]
        (set-composite composite alpha)))
@@ -399,7 +390,7 @@
                       (.fillRect default-g2d x y w h)
                       (.drawRect default-g2d x y w h))))
   ([x y w h fill]
-   (rectangle x y w h {})))
+   (rectangle x y w h fill {})))
 
 
 (defn round-rectangle
@@ -475,11 +466,11 @@
    (draw-fill-reset settings
                     (.drawImage default-g2d x1dest y1dest x2dest y2dest x1src y1src x2src y2src img nil))))
 
-(defn save-image [path]
+(defn save-image [image path]
   "Stores default-image into file. Available formats are gif jpeg and png"
   (let [file (File. path)
         format (last (clojure.string/split path #"\."))]
-    (ImageIO/write default-image format file)))
+    (ImageIO/write image format file)))
 
 (defn to-json
   "Converts default-iamge to Base64 JSON"
@@ -490,14 +481,17 @@
       (clojure.string/replace (String. (b64/encode bytes)) #"\+|/" {"+" "-" "/" "_"}))
     ))
 
-(defn show-image []
+(defn show-image [image]
   "Show default-image in Jframe"
-  (let [dimensison (Dimension. (.getWidth default-image) (.getHeight default-image))]
+  (let [frame (proxy [JFrame] []
+                (paint [#^Graphics g]
+                  (.drawImage g image 0 0 nil)))
+        dimensison (Dimension. (.getWidth image) (.getHeight image))]
     (doto frame
       (.setSize dimensison)
       (.setVisible true))))
 
-(defn repaint []
+(defn repaint [frame]
   "Repaint default-image in displayed JFrame"
   (.repaint frame))
 
@@ -505,20 +499,22 @@
   ":as --> :file; :path PATH = Renders the default-image and stores it as file to the defiend path
   :as --> :show = Renders the default-image and displays it in a JFrame
   :as --> :json = Renders the default-image and converts it to JSON"
-  ([{:keys [as path clipping]}]
+  ([image {:keys [as path clipping]}]
    (if (= as :show)
      (do
        (println "Das Bild wird nun in einem JFrame in der größe des BufferedImage angezeigt")
-       (show-image)))
+       (show-image image)))
    (if (= as :file)
      (do
        (println (str "Saved image to " path))
-       (save-image path)))
+       (save-image image path)))
    (if (= as :json)
      (do
        (to-json))))
+  ([image]
+   (render-output image {:as :show}))
   ([]
-   (render-output {:as :show}))
+   (render-output default-image))
   )
 
 (defmacro compose
@@ -529,10 +525,12 @@
      (binding [default-image image#
                default-g2d (.createGraphics image#)
                default-render-settings ~(merge default-render-settings settings)]
-       (set-rendering-hints ~default-render-settings)
-       (do ~@body))))
+       (set-rendering-hints default-render-settings)
+       (do
+         ~@body
+         default-image))))
 
-(defmacro draw
+(defmacro with-shape-settings
   [settings & body]
   `(binding [default-shape-values ~(merge default-shape-values settings)]
      (do
