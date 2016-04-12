@@ -1,10 +1,10 @@
 (ns image-compose.core
   (:require [clojure.data.codec.base64 :as b64])
-  (:import (java.awt Color Font Graphics Graphics2D Dimension Composite BasicStroke RenderingHints AlphaComposite Polygon)
+  (:import (java.awt Color Font Graphics Graphics2D Dimension  BasicStroke RenderingHints AlphaComposite )
            (java.awt.font TextAttribute)
            (java.awt.image BufferedImage RescaleOp)
            (javax.swing JFrame)
-           (java.awt.geom Rectangle2D$Double Line2D$Double AffineTransform GeneralPath)
+           (java.awt.geom   AffineTransform )
            (javax.imageio ImageIO)
            (java.io File ByteArrayOutputStream)))
 
@@ -316,10 +316,7 @@
                                 rendering (assoc (RenderingHints/KEY_RENDERING) (rendering keys-rendering))
                                 stroke-control (assoc (RenderingHints/KEY_STROKE_CONTROL) (stroke-control keys-stroke-control))
                                 text-antialiasing (assoc (RenderingHints/KEY_TEXT_ANTIALIASING) (text-antialiasing keys-text-antialiasing)))]
-    (println antialiasing)
-    (println (str "before " rendering-hints))
     (.setRenderingHints default-g2d rendering-hints)
-    (println (str "after " (.getRenderingHints default-g2d)))
     (if background
       (set-background background))))
 
@@ -502,11 +499,9 @@
   ([image {:keys [as path clipping]}]
    (if (= as :show)
      (do
-       (println "Das Bild wird nun in einem JFrame in der größe des BufferedImage angezeigt")
        (show-image image)))
    (if (= as :file)
      (do
-       (println (str "Saved image to " path))
        (save-image image path)))
    (if (= as :json)
      (do

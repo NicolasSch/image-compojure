@@ -1,6 +1,6 @@
-# graphics2d-enclojed
+# image-compose
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure library designed to compose images in parallel threads
 
 ## Usage
 
