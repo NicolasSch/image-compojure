@@ -1,5 +1,54 @@
 ToDo
 
+---------------------------------------  Offen --------------------------------------------------------------------
+
+Shapes settings setzen
+    -GradientPaint
+    -PaintMode
+    -XORMODE
+
+Transformationen
+    - Texte transformieren
+
+
+Bilder laden
+    - croppen
+    - blurren
+
+With-Transfomr Macro
+    - Texte transformieren
+
+
+- Beschreibungen korrektur lesen
+
+-Hit-Detection
+
+
+---------------------------------------  Prüfen: --------------------------------------------------------------------
+
+Prüfen warum Bild nicht mit filter gezeichnet werden kann
+    -DrawImage returns nil statt true (Wahrscheinlich stimmt am ScaleOp Obj etwas nicht)
+
+
+Testen:
+Bild zeichen
+    - scalieren --> erledigt
+    - positionieren -->erledigt
+    - composite
+
+---------------------------------------    Done    ---------------------------------------------------------------
+
+
+Texte laden
+    - zeichnen --> erledigt
+    - stylen --> erledigt
+    - mit transformation zeichnen
+
+Diverse nützliche Funktionen
+    - Fonts erstellen --> erledigt
+    - Farben erstellen --> erledigt
+    - ScaleOp erstellen --> testen
+
 Shapes zeichnen
     -Shapes
         - Line
@@ -10,41 +59,22 @@ Shapes zeichnen
         - Genral Path
     -default-shape-settings
     -Shape settings setzen
-    -GradientPaint
-
-Diverse nützliche Funktionen
-    - Fonts erstellen --> erledigt
-    - Farben erstellen --> erledigt
-    - ScaleOp erstellen --> testen
-
-Texte zeichen
-    - zeichnen --> erledigt
-    - stylen --> erledigt
-    - mit transformation zeichnen
 
 Bilder zeichnen
     - Bild laden --> erledigt
     - Bild einfügen --> erledigt
     - Bild settings setzen --> erledigt
-    - croppen
-    - blurren
 
-Create-Image Macro
+Compose Macro
     - Bind default-g2d
     - Bind default-image
     - setzen der RenderingHints
 
-Draw Macro
+with-shape-settings Macro
     - Bind default-shape-settings
     - setze default-shape-settings
     - ausführen des Bodies
 
-With-Transfomr Macro
-    - Erstellen eines Transformations-Objetes
-        -Translate
-        -Scale
-        -Rotate
-        -Shear
 
 Output
     - In Frame anzeigen --> erledigt
@@ -52,18 +82,9 @@ Output
     - In Datei speichern --> erledigt
     - Nach JSON exportieren --> erledigt
 
-
-
-Testen:
-Bild zeichen
-    - scalieren --> erledigt
-    - positionieren -->erledigt
-    - composite
-
-
-
-Prüfen:
-
-Prüfen warum Bild nicht mit filter gezeichnet werden kann
-    -DrawImage returns nil statt true (Wahrscheinlich stimmt am ScaleOp Obj etwas nicht)
-
+With-Transfomr Macro
+    - Erstellen eines Transformations-Objetes
+        -Translate
+        -Scale
+        -Rotate
+        -Shear

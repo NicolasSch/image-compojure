@@ -1,10 +1,10 @@
 (ns image-compose.core
   (:require [clojure.data.codec.base64 :as b64])
-  (:import (java.awt Color Font Graphics Graphics2D Dimension  BasicStroke RenderingHints AlphaComposite )
+  (:import (java.awt Color Font Graphics Graphics2D Dimension BasicStroke RenderingHints AlphaComposite)
            (java.awt.font TextAttribute)
            (java.awt.image BufferedImage RescaleOp)
            (javax.swing JFrame)
-           (java.awt.geom   AffineTransform )
+           (java.awt.geom AffineTransform)
            (javax.imageio ImageIO)
            (java.io File ByteArrayOutputStream)))
 
@@ -62,6 +62,10 @@
            ))
   ([r g b] (Color. r g b 1))
   ([r g b a] (Color. r g b a)))
+
+(defn gradient-paint []
+
+  )
 
 
 (def ^:dynamic default-image (BufferedImage. 1920 1080 BufferedImage/TYPE_INT_ARGB))
@@ -298,6 +302,12 @@
   "Sets font on default-g2d object"
   (.setFont default-g2d font))
 
+(defn set-clip
+  ([x1 y1 x2 y2]
+   (.clipRect default-g2d x1 y1 x2 y2))
+  ([shape]
+   (.clip default-g2d shape)))
+
 (defn set-composite [comp alpha]
   "Sets composite attribute on default-g2d object"
   (let [alpha-composite (. AlphaComposite getInstance (comp composite-rules) alpha)]
@@ -356,7 +366,6 @@
     (.setFont default-g2d old-font)
     ))
 
-
 (defn line
   "Draws line to default-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing"
@@ -378,67 +387,70 @@
    (polyline x y number {})))
 
 
+(defn draw-fill [settings fill-func draw-func]
+  (let [fill (:fill settings)
+        settings (dissoc settings :fill)]
+    (draw-fill-reset settings
+                     (if fill
+                       (fill-func)
+                       (draw-func)))))
+
 (defn rectangle
   "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
-  ([x y w h fill settings]
-   (draw-fill-reset settings
-                    (if fill
-                      (.fillRect default-g2d x y w h)
-                      (.drawRect default-g2d x y w h))))
-  ([x y w h fill]
-   (rectangle x y w h fill {})))
+  ([x y w h settings]
+   (draw-fill settings
+              #(.fillRect default-g2d x y w h)
+              #(.drawRect default-g2d x y w h)))
+  ([x y w h]
+   (rectangle x y w h {:fill true})))
 
 
 (defn round-rectangle
   "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
-  ([x y w h arcW arcH fill settings]
-   (draw-fill-reset settings
-                    (if fill
-                      (.fillRoundRect default-g2d x y w h arcW arcH)
-                      (.drawRoundRect default-g2d x y w h arcW arcH))))
-  ([x y w h arcW arcH fill]
-   (round-rectangle x y w h arcW arcH fill {})))
+  ([x y w h arcW arcH settings]
+   (draw-fill settings
+              #(.fillRoundRect default-g2d x y w h arcW arcH)
+              #(.drawRoundRect default-g2d x y w h arcW arcH)))
+  ([x y w h arcW arcH]
+   (round-rectangle x y w h arcW arcH {:fill true})))
 
 
 (defn oval
   "Draws an oval to default-g2d-object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
-  ([x y w h fill settings]
-   (draw-fill-reset settings
-                    (if fill
-                      (.fillOval default-g2d x y w h)
-                      (.drawOval default-g2d x y w h))))
-  ([x y w h fill]
-   (oval x y w h fill {})))
+  ([x y w h settings]
+   (draw-fill settings
+              #(.fillOval default-g2d x y w h)
+              #(.drawOval default-g2d x y w h)))
+  ([x y w h]
+   (oval x y w h {:fill true})))
 
 
 (defn polygon
   "Draws a polygon to the default-g2d object. May be called with shape settings. Settings will be restored after drawing process.
   Takes sequences of x, y coordinates and number of points the polygon consists of"
-  ([x y fill settings]
+  ([x y settings]
    (if-not (= (count x) (count y))
      (throw (RuntimeException.
               "Number of x and y coordinates must be equal")))
-   (draw-fill-reset settings
-                    (if fill
-                      (.drawPolygon default-g2d (int-array x) (int-array y) (count x))
-                      (.fillPolygon default-g2d x y (count x)))))
-  ([x y fill]
-   (polygon x y fill {})))
+   (draw-fill settings
+              #(.drawPolygon default-g2d (int-array x) (int-array y) (count x))
+              #(.fillPolygon default-g2d x y (count x))))
+  ([x y]
+   (polygon x y {})))
 
 
 (defn shapes
   "Draws shape object to default-g2d object. Can be called with shape settings map to overide defualt-shape-settings.
   Shape settings will be restored when passed to function."
-  ([shapes-vec fill settings]
-   (draw-fill-reset settings
-                    (if fill
-                      (doseq [shape-obj shapes-vec] (.fill default-g2d shape-obj))
-                      (doseq [shape-obj shapes-vec] (.draw default-g2d shape-obj)))))
-  ([shapes-vec fill]
-   (shapes shapes-vec fill {})))
+  ([shapes-vec settings]
+   (draw-fill settings
+              #(doseq [shape-obj shapes-vec] (.fill default-g2d shape-obj))
+              #(doseq [shape-obj shapes-vec] (.draw default-g2d shape-obj))))
+  ([shapes-vec]
+   (shapes shapes-vec {:fill true})))
 
 
 (defn image
@@ -446,10 +458,10 @@
    Setting will be restored to default-shape-settings
    May also scale image to fit into wanted area.
    Settings attribute :filter takes an ScaleOp Object which can be defined by function create-scaleop"
-  ([x y img]
+  ([img x y]
    (image x y img {}))
 
-  ([x y img settings]
+  ([img x y settings]
    (let [filter (:filter settings)]
      (draw-fill-reset settings
                       (if filter
@@ -457,11 +469,11 @@
                         (.drawImage default-g2d img x y nil)))))
 
   ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src]
-   (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img {}))
+   (image img x1dest y1dest x2dest y2dest x1src y1src x2src y2src {}))
 
   ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings]
    (draw-fill-reset settings
-                    (.drawImage default-g2d x1dest y1dest x2dest y2dest x1src y1src x2src y2src img nil))))
+                    (.drawImage default-g2d img x1dest y1dest x2dest y2dest x1src y1src x2src y2src nil))))
 
 (defn save-image [image path]
   "Stores default-image into file. Available formats are gif jpeg and png"
@@ -497,15 +509,17 @@
   :as --> :show = Renders the default-image and displays it in a JFrame
   :as --> :json = Renders the default-image and converts it to JSON"
   ([image {:keys [as path clipping]}]
-   (if (= as :show)
+   (if clipping
+     (do (if (seq? (type clipping))
+           (set-clip (first clipping) (second clipping) (nth clipping 2) (last clipping))
+           (set-clip clipping)))
      (do
-       (show-image image)))
-   (if (= as :file)
-     (do
-       (save-image image path)))
-   (if (= as :json)
-     (do
-       (to-json))))
+       (if (= as :show)
+         (show-image image))
+       (if (= as :file)
+         (save-image image path))
+       (if (= as :json)
+         (to-json)))))
   ([image]
    (render-output image {:as :show}))
   ([]
