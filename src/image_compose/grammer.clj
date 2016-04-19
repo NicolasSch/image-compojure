@@ -28,15 +28,15 @@
               }
              ;hier angegeben settings werden auf alle folgenden shapes angewendet
              ;kann eine option nicht angewendet werden, wir diese ignoriert z.b. :jojnstyle image
-             (img/with-shape-settings {:color     colorHex
+             (img/with-shape-settings {:paint     colorHex
                                        :linewidth 0.5
                                        :joinstyle :dash
                                        :composite :source}
-                                      (line 1 1 2 2 {:color     colorDef
+                                      (line 1 1 2 2 {:paint     colorDef
                                                      :linewidth 0.5
                                                      :joinstyle :dash
                                                      :composite :src})
-                                      (rectangle 50 50 100 100 true {:color     (. Color/green)
+                                      (rectangle 50 50 100 100 true {:paint     (. Color/green)
                                                                      :linewidth 0.5
                                                                      :joinstyle :dash
                                                                      :composite :source

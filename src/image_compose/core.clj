@@ -63,9 +63,11 @@
   ([r g b] (Color. r g b 1))
   ([r g b a] (Color. r g b a)))
 
-(defn gradient-paint [x1 y1 color1 x2 y2 color2]
-  (GradientPaint. x1 y1 color1 x2 y2 color2)
-  )
+(defn gradient-paint
+  ([x1 y1 color1 x2 y2 color2 cyclic]
+   (GradientPaint. x1 y1 color1 x2 y2 color2 cyclic))
+  ([x1 y1 color1 x2 y2 color2]
+   (GradientPaint. x1 y1 color1 x2 y2 color2)))
 
 
 (def ^:dynamic default-image (BufferedImage. 1920 1080 BufferedImage/TYPE_INT_ARGB))
@@ -78,7 +80,7 @@
                                      :dash-phase  0
                                      :composite   :src_over
                                      :alpha       1.0
-                                     :color       '(color :black)
+                                     :paint       '(color :black)
                                      })
 
 (def ^:dynamic default-render-settings {:antialiasing         :off
@@ -293,7 +295,7 @@
 
 (defn set-background [color]
   "Is called on compose macro when background key in settings map is defiend"
-  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) {:fill true :composite :src :color color}))
+  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) {:fill true :composite :src :paint color}))
 
 (defn set-stroke
   "Sets stroke attributes on default-g2d object"
@@ -322,11 +324,11 @@
 
 (defn set-rendering-hints
   "Is called on compose macro to set renderinghints on default-g2d object"
-  [{:keys [antialiasing aplpha-interpolation color-rendering dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing background]}]
+  [{:keys [antialiasing aplpha-interpolation paint dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing background]}]
   (let [rendering-hints (when-> {}
                                 antialiasing (assoc (RenderingHints/KEY_ANTIALIASING) (antialiasing keys-antialiasing))
                                 aplpha-interpolation (assoc (RenderingHints/KEY_ALPHA_INTERPOLATION) (aplpha-interpolation keys-alpha-interpolation))
-                                color-rendering (assoc (RenderingHints/KEY_COLOR_RENDERING) (color-rendering keys-color-rendering))
+                                paint (assoc (RenderingHints/KEY_COLOR_RENDERING) (paint keys-color-rendering))
                                 dithering (assoc (RenderingHints/KEY_DITHERING) (dithering keys-dithering))
                                 fractional-metrics (assoc (RenderingHints/KEY_FRACTIONALMETRICS) (fractional-metrics keys-fractional-metrics))
                                 interpolatioin (assoc (RenderingHints/KEY_INTERPOLATION) (interpolatioin keys-interpolation))
@@ -339,7 +341,7 @@
 
 (defn set-shape-settings
   "Sets attributes for stroke, color and composite to default-g2d object."
-  ([{:keys [width cap join miter-limit dash dash-phase composite alpha color]}]
+  ([{:keys [width cap join miter-limit dash dash-phase composite alpha paint]}]
    (if (or width cap join miter-limit dash dash-phase)
      (let [width (or width (:width default-shape-values))
            cap (or cap (:cap default-shape-values))
@@ -351,8 +353,10 @@
            dash-phase (or dash-phase (:dash-phase default-shape-values))]
        (set-stroke width cap join miter-limit dash dash-phase)
        ))
-   (if color
-     (do (set-color (eval color))))
+   (if paint
+     (if (keyword? paint)
+       (set-color (color paint))
+       (set-color (eval paint))))
    (if composite
      (let [alpha (or alpha (:alpha default-shape-values))]
        (set-composite composite alpha)))
@@ -550,7 +554,7 @@
   [settings & body]
   `(do
      (binding [default-shape-values ~(merge default-shape-values settings)]
-     (do
-       (set-shape-settings)
-       ~@body))
-       (reset-shape-settings)))
+       (do
+         (set-shape-settings)
+         ~@body))
+     (reset-shape-settings)))
