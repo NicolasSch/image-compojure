@@ -1,12 +1,13 @@
 (ns image-compose.core
   (:require [clojure.data.codec.base64 :as b64])
-  (:import (java.awt Color Font Graphics Graphics2D Dimension BasicStroke RenderingHints AlphaComposite GradientPaint)
+  (:import (java.awt Color Font Graphics Graphics2D Dimension BasicStroke RenderingHints AlphaComposite GradientPaint TexturePaint)
            (java.awt.font TextAttribute)
            (java.awt.image BufferedImage RescaleOp)
            (javax.swing JFrame)
-           (java.awt.geom AffineTransform)
+           (java.awt.geom AffineTransform Rectangle2D$Double)
            (javax.imageio ImageIO)
-           (java.io File ByteArrayOutputStream)))
+           (java.io File ByteArrayOutputStream)
+           (javafx.geometry Rectangle2D)))
 
 
 (declare set-background rectangle set-shape-settings reset-shape-settings)
@@ -69,6 +70,12 @@
   ([x1 y1 color1 x2 y2 color2]
    (GradientPaint. x1 y1 color1 x2 y2 color2)))
 
+(defn texture-paint
+  [txtr anchor-x1 anchor-y1 anchor-x2 anchor-y2]
+  (let [rec (Rectangle2D$Double. anchor-x1 anchor-y1 anchor-x2 anchor-y2)]
+    (TexturePaint. txtr rec)
+    ))
+
 
 (def ^:dynamic default-image (BufferedImage. 1920 1080 BufferedImage/TYPE_INT_ARGB))
 (def ^:dynamic default-g2d (.createGraphics default-image))
@@ -93,10 +100,6 @@
                                         :stroke-control       :default
                                         :text-antialiasing    :default
                                         })
-
-
-
-
 
 (def stroke-caps {:butt   (BasicStroke/CAP_BUTT)
                   :round  (BasicStroke/CAP_ROUND)
@@ -480,11 +483,20 @@
                         (.drawImage default-g2d img x y nil)))))
 
   ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src]
-   (image img x1dest y1dest x2dest y2dest x1src y1src x2src y2src {}))
+   (image img x1dest y1dest x2dest y2dest x1src y1src x2src y2src {} default-g2d))
 
   ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings]
+   (image img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings default-g2d))
+
+  ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings g2d]
    (draw-fill-reset settings
-                    (.drawImage default-g2d img x1dest y1dest x2dest y2dest x1src y1src x2src y2src nil))))
+                    (.drawImage g2d img x1dest y1dest x2dest y2dest x1src y1src x2src y2src nil))))
+
+(defn resize-image
+  [img-to-scale w h ]
+    (let [new-img (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
+      (image img-to-scale 0 0 w h 0 0 (.getWidth img-to-scale) (.getHeight img-to-scale) {} (.createGraphics new-img))
+      new-img))
 
 (defn save-image [image path]
   "Stores default-image into file. Available formats are gif jpeg and png"
