@@ -1,6 +1,6 @@
 (ns image-compose.core
   (:require [clojure.data.codec.base64 :as b64])
-  (:import (java.awt Color Font Graphics Graphics2D Dimension BasicStroke RenderingHints AlphaComposite)
+  (:import (java.awt Color Font Graphics Graphics2D Dimension BasicStroke RenderingHints AlphaComposite GradientPaint)
            (java.awt.font TextAttribute)
            (java.awt.image BufferedImage RescaleOp)
            (javax.swing JFrame)
@@ -63,8 +63,8 @@
   ([r g b] (Color. r g b 1))
   ([r g b a] (Color. r g b a)))
 
-(defn gradient-paint []
-
+(defn gradient-paint [x1 y1 color1 x2 y2 color2]
+  (GradientPaint. x1 y1 color1 x2 y2 color2)
   )
 
 
@@ -239,8 +239,6 @@
   ""
   ([trans & forms]
    `(let [current-trans# (.getTransform default-g2d)
-          ;wieso scheine ich current-trans nicht in der nachfolgenden zeile verwenden zu können????
-          ;testen ob weglassen... transform concates von sich aus?
           new-trans# (concat-transforms (.getTransform default-g2d) ~trans)]
       (do
         (.transform default-g2d new-trans#)
@@ -258,27 +256,36 @@
    (Font. (name fonts) (style font-styles) size)
     ))
 
-(defn create-styled-text [text name style size {:keys [weight width underline foreground background strike-through swap-colors kerning]}]
+(defn create-styled-text
   "Creates a map containing the text which shall be drawn to the default-g2d object as String and a font defined by
   FontfamilyName, Style, Size and Textattributes
   For available FontFamilys and styles see defiend maps 'fonts' and 'font-styles'
   Available Textatrributes can be seen in maps: text-weight, text-width, text-posture, text-underline.
   Furthermore fonts can be defiend by the keys: :kerning bool, :swap-colors bool , :foreground Color, :background Color,
   :name String(FontFamilyName), style int"
-  (let [font (create-font name style size)
-        styled-font (when-> {}
-                            kerning (assoc (TextAttribute/KERNING) (TextAttribute/KERNING_ON))
-                            strike-through (assoc (TextAttribute/STRIKETHROUGH) (TextAttribute/STRIKETHROUGH_ON))
-                            swap-colors (assoc (TextAttribute/SWAP_COLORS) (TextAttribute/SWAP_COLORS_ON))
-                            width (assoc (TextAttribute/WIDTH) (width text-width))
-                            weight (assoc (TextAttribute/WEIGHT) (weight text-weight))
-                            underline (assoc (TextAttribute/UNDERLINE) (underline text-underline))
-                            foreground (assoc (TextAttribute/FOREGROUND) foreground)
-                            background (assoc (TextAttribute/BACKGROUND) background))]
+  ([text name style size {:keys [weight width underline foreground background strike-through swap-colors kerning]}]
+   (let [font (create-font name style size)
+         styled-font (when-> {}
+                             kerning (assoc (TextAttribute/KERNING) (TextAttribute/KERNING_ON))
+                             strike-through (assoc (TextAttribute/STRIKETHROUGH) (TextAttribute/STRIKETHROUGH_ON))
+                             swap-colors (assoc (TextAttribute/SWAP_COLORS) (TextAttribute/SWAP_COLORS_ON))
+                             width (assoc (TextAttribute/WIDTH) (width text-width))
+                             weight (assoc (TextAttribute/WEIGHT) (weight text-weight))
+                             underline (assoc (TextAttribute/UNDERLINE) (underline text-underline))
+                             foreground (assoc (TextAttribute/FOREGROUND) foreground)
+                             background (assoc (TextAttribute/BACKGROUND) background))]
 
-    (-> {}
-        (assoc :text text)
-        (assoc :font (.deriveFont font styled-font)))))
+     (-> {}
+         (assoc :text text)
+         (assoc :font (.deriveFont font styled-font)))))
+  ([text name style size]
+   (create-styled-text text name style size {}))
+  ([text name style]
+   (create-styled-text text name style 20 {}))
+  ([text name]
+   (create-styled-text text name :plain 20 {}))
+  ([text]
+   (create-styled-text text :dialog :plain 20 {})))
 
 (defn create-scale-op [& rgba]
   "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
@@ -286,7 +293,7 @@
 
 (defn set-background [color]
   "Is called on compose macro when background key in settings map is defiend"
-  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) true {:composite :src :color color}))
+  (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) {:fill true :composite :src :color color}))
 
 (defn set-stroke
   "Sets stroke attributes on default-g2d object"
@@ -510,7 +517,7 @@
   :as --> :json = Renders the default-image and converts it to JSON"
   ([image {:keys [as path clipping]}]
    (if clipping
-     (do (if (seq? (type clipping))
+     (do (if (seq? clipping)
            (set-clip (first clipping) (second clipping) (nth clipping 2) (last clipping))
            (set-clip clipping)))
      (do
@@ -541,8 +548,9 @@
 
 (defmacro with-shape-settings
   [settings & body]
-  `(binding [default-shape-values ~(merge default-shape-values settings)]
+  `(do
+     (binding [default-shape-values ~(merge default-shape-values settings)]
      (do
        (set-shape-settings)
-       ~@body
-       (reset-shape-settings))))
+       ~@body))
+       (reset-shape-settings)))
