@@ -303,9 +303,9 @@
   (let [stroke (BasicStroke. width (cap stroke-caps) (join stroke-joins) miter-limit dash dash-phase)]
     (.setStroke default-g2d stroke)))
 
-(defn set-color [color]
+(defn set-paint [color]
   "Sets paint color on default-g2d object "
-  (.setColor default-g2d color))
+  (.setPaint default-g2d color))
 
 (defn set-font [font]
   "Sets font on default-g2d object"
@@ -355,8 +355,8 @@
        ))
    (if paint
      (if (keyword? paint)
-       (set-color (color paint))
-       (set-color (eval paint))))
+       (set-paint (color paint))
+       (set-paint (eval paint))))
    (if composite
      (let [alpha (or alpha (:alpha default-shape-values))]
        (set-composite composite alpha)))
