@@ -88,6 +88,7 @@
                                      :composite   :src_over
                                      :alpha       1.0
                                      :paint       '(color :black)
+                                     :xor-mode    nil
                                      })
 
 (def ^:dynamic default-render-settings {:antialiasing         :off
@@ -306,6 +307,15 @@
   (let [stroke (BasicStroke. width (cap stroke-caps) (join stroke-joins) miter-limit dash dash-phase)]
     (.setStroke default-g2d stroke)))
 
+(defn set-xor-mode [paint]
+  (if (keyword? paint)
+    (.setXORMode default-g2d (color paint))
+    (.setXORMode default-g2d paint)))
+
+(defn set-paint-mode []
+  (.setPaintMode default-g2d))
+
+
 (defn set-paint [color]
   "Sets paint color on default-g2d object "
   (.setPaint default-g2d color))
@@ -344,7 +354,7 @@
 
 (defn set-shape-settings
   "Sets attributes for stroke, color and composite to default-g2d object."
-  ([{:keys [width cap join miter-limit dash dash-phase composite alpha paint]}]
+  ([{:keys [width cap join miter-limit dash dash-phase composite alpha paint xor-mode]}]
    (if (or width cap join miter-limit dash dash-phase)
      (let [width (or width (:width default-shape-values))
            cap (or cap (:cap default-shape-values))
@@ -363,13 +373,16 @@
    (if composite
      (let [alpha (or alpha (:alpha default-shape-values))]
        (set-composite composite alpha)))
+   (if xor-mode
+     (set-xor-mode xor-mode))
     )
   ([]
    (set-shape-settings default-shape-values)))
 
 (defn reset-shape-settings []
   "Calls on set-shape-settings to reset shape-settings back to defined default-shape-settings"
-  (set-shape-settings))
+  (set-shape-settings)
+  (set-paint-mode))
 
 
 (defn styled-text [x y styled-text]
@@ -492,11 +505,15 @@
    (draw-fill-reset settings
                     (.drawImage g2d img x1dest y1dest x2dest y2dest x1src y1src x2src y2src nil))))
 
-(defn resize-image
-  [img-to-scale w h ]
-    (let [new-img (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
-      (image img-to-scale 0 0 w h 0 0 (.getWidth img-to-scale) (.getHeight img-to-scale) {} (.createGraphics new-img))
-      new-img))
+(defn resize
+  [img-to-scale w h]
+  (let [new-img (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
+    (image img-to-scale 0 0 w h 0 0 (.getWidth img-to-scale) (.getHeight img-to-scale) {} (.createGraphics new-img))
+    new-img))
+
+(defn crop [])
+
+(defn blur [])
 
 (defn save-image [image path]
   "Stores default-image into file. Available formats are gif jpeg and png"
