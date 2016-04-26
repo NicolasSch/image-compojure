@@ -5,6 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95b25ee1-48ea-4f6b-889e-c8ea3f584148" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/image_compose/grammar.clj" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/image_compose/grammer.clj" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/replstate.xml" afterPath="$PROJECT_DIR$/.idea/replstate.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/image_compose/core.clj" afterPath="$PROJECT_DIR$/src/image_compose/core.clj" />
@@ -32,116 +35,8 @@
       <file leaf-file-name="core.clj" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/image_compose/core.clj">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.25922954">
-              <caret line="361" column="67" selection-start-line="361" selection-start-column="67" selection-end-line="361" selection-end-column="67" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Graphics.java" pinned="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files/Java/jdk1.8.0_66/src.zip!/java/awt/Graphics.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-14.068966">
-              <caret line="113" column="16" selection-start-line="113" selection-start-column="13" selection-end-line="113" selection-end-column="16" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GradientPaint.java" pinned="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files/Java/jdk1.8.0_66/src.zip!/java/awt/GradientPaint.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="82" column="11" selection-start-line="82" selection-start-column="11" selection-end-line="82" selection-end-column="11" />
-              <folding>
-                <element signature="e#0#9599#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#6408#6409#0" expanded="false" />
-                <element signature="e#6460#6461#0" expanded="false" />
-                <element signature="e#6646#6647#0" expanded="false" />
-                <element signature="e#6675#6676#0" expanded="false" />
-                <element signature="e#6943#6944#0" expanded="false" />
-                <element signature="e#6995#6996#0" expanded="false" />
-                <element signature="e#7181#7182#0" expanded="false" />
-                <element signature="e#7210#7211#0" expanded="false" />
-                <element signature="e#7495#7496#0" expanded="false" />
-                <element signature="e#7524#7525#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RenderingHints.java" pinned="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files/Java/jdk1.8.0_66/src.zip!/java/awt/RenderingHints.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="372" column="32" selection-start-line="372" selection-start-column="32" selection-end-line="372" selection-end-column="32" />
-              <folding>
-                <element signature="e#0#54685#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#7651#7652#0" expanded="false" />
-                <element signature="e#7692#7693#0" expanded="false" />
-                <element signature="e#7933#7934#0" expanded="false" />
-                <element signature="e#7980#7981#0" expanded="false" />
-                <element signature="e#8172#8173#0" expanded="false" />
-                <element signature="e#8212#8213#0" expanded="false" />
-                <element signature="e#41710#41711#0" expanded="false" />
-                <element signature="e#41749#41750#0" expanded="false" />
-                <element signature="e#41981#41982#0" expanded="false" />
-                <element signature="e#42018#42019#0" expanded="false" />
-                <element signature="e#42289#42290#0" expanded="false" />
-                <element signature="e#42329#42330#0" expanded="false" />
-                <element signature="e#42828#42829#0" expanded="false" />
-                <element signature="e#42881#42882#0" expanded="false" />
-                <element signature="e#43712#43713#0" expanded="false" />
-                <element signature="e#43763#43764#0" expanded="false" />
-                <element signature="e#44241#44242#0" expanded="false" />
-                <element signature="e#44286#44287#0" expanded="false" />
-                <element signature="e#46162#46163#0" expanded="false" />
-                <element signature="e#46207#46208#0" expanded="false" />
-                <element signature="e#46335#46336#0" expanded="false" />
-                <element signature="e#46366#46367#0" expanded="false" />
-                <element signature="e#46985#46986#0" expanded="false" />
-                <element signature="e#47033#47034#0" expanded="false" />
-                <element signature="e#49296#49297#0" expanded="false" />
-                <element signature="e#49335#49336#0" expanded="false" />
-                <element signature="e#50442#50443#0" expanded="false" />
-                <element signature="e#50481#50482#0" expanded="false" />
-                <element signature="e#51337#51338#0" expanded="false" />
-                <element signature="e#51407#51408#0" expanded="false" />
-                <element signature="e#53486#53487#0" expanded="false" />
-                <element signature="e#53527#53528#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SunHints.class" pinned="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files/Java/jdk1.8.0_66/jre/lib/rt.jar!/sun/awt/SunHints.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="116" column="95" selection-start-line="116" selection-start-column="95" selection-end-line="116" selection-end-column="95" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Graphics2D.java" pinned="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files/Java/jdk1.8.0_66/src.zip!/java/awt/Graphics2D.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-13.275862">
-              <caret line="789" column="27" selection-start-line="789" selection-start-column="27" selection-end-line="789" selection-end-column="27" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="project.clj" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/project.clj">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.110929854">
+              <caret line="8" column="47" selection-start-line="8" selection-start-column="47" selection-end-line="8" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -157,11 +52,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="grammer.clj" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+      <file leaf-file-name="grammar.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="57" column="31" selection-start-line="57" selection-start-column="31" selection-end-line="57" selection-end-column="31" />
+              <caret line="68" column="19" selection-start-line="68" selection-start-column="19" selection-end-line="68" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -193,9 +88,10 @@
         <option value="$PROJECT_DIR$/src/graphics2d_enclojed/grammer.clj" />
         <option value="$PROJECT_DIR$/project.clj" />
         <option value="$PROJECT_DIR$/src/image_compose/unittest.clj" />
-        <option value="$PROJECT_DIR$/src/image_compose/grammer.clj" />
         <option value="$PROJECT_DIR$/src/image_compose/tests.clj" />
         <option value="$PROJECT_DIR$/doc/notizen.txt" />
+        <option value="$PROJECT_DIR$/src/image_compose/grammer.clj" />
+        <option value="$PROJECT_DIR$/src/image_compose/grammar.clj" />
         <option value="$PROJECT_DIR$/src/image_compose/core.clj" />
       </list>
     </option>
@@ -208,10 +104,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1343" />
-    <option name="y" value="69" />
-    <option name="width" value="1734" />
-    <option name="height" value="1407" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="3452" />
+    <option name="height" value="1416" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -238,6 +134,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -305,7 +202,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -721,11 +617,17 @@
       <option name="project" value="LOCAL" />
       <updated>1461109631576</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="added xormode to set-shape-settings">
+      <created>1461167051033</created>
+      <option name="number" value="00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1461167051033</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1343" y="69" width="1734" height="1407" extended-state="0" />
+    <frame x="-8" y="-8" width="3452" height="1416" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -734,13 +636,13 @@
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="REPL" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.85364395" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.43926886" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14635603" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.07193396" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -784,7 +686,8 @@
     <MESSAGE value="use keywords to define paint for standard java colors" />
     <MESSAGE value=" renamend set-color / set-paint - changed method to apply gradientpaint" />
     <MESSAGE value="new function resize-image to return resized bufferedimage" />
-    <option name="LAST_COMMIT_MESSAGE" value="new function resize-image to return resized bufferedimage" />
+    <MESSAGE value="added xormode to set-shape-settings" />
+    <option name="LAST_COMMIT_MESSAGE" value="added xormode to set-shape-settings" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -813,7 +716,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="24" column="44" selection-start-line="24" selection-start-column="44" selection-end-line="24" selection-end-column="44" />
@@ -828,7 +731,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
@@ -858,7 +761,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
@@ -888,7 +791,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
@@ -918,7 +821,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
@@ -934,7 +837,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
@@ -950,7 +853,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -966,7 +869,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
@@ -1072,7 +975,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1087,42 +989,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="372" column="32" selection-start-line="372" selection-start-column="32" selection-end-line="372" selection-end-column="32" />
-          <folding>
-            <element signature="e#0#54685#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#7651#7652#0" expanded="false" />
-            <element signature="e#7692#7693#0" expanded="false" />
-            <element signature="e#7933#7934#0" expanded="false" />
-            <element signature="e#7980#7981#0" expanded="false" />
-            <element signature="e#8172#8173#0" expanded="false" />
-            <element signature="e#8212#8213#0" expanded="false" />
-            <element signature="e#41710#41711#0" expanded="false" />
-            <element signature="e#41749#41750#0" expanded="false" />
-            <element signature="e#41981#41982#0" expanded="false" />
-            <element signature="e#42018#42019#0" expanded="false" />
-            <element signature="e#42289#42290#0" expanded="false" />
-            <element signature="e#42329#42330#0" expanded="false" />
-            <element signature="e#42828#42829#0" expanded="false" />
-            <element signature="e#42881#42882#0" expanded="false" />
-            <element signature="e#43712#43713#0" expanded="false" />
-            <element signature="e#43763#43764#0" expanded="false" />
-            <element signature="e#44241#44242#0" expanded="false" />
-            <element signature="e#44286#44287#0" expanded="false" />
-            <element signature="e#46162#46163#0" expanded="false" />
-            <element signature="e#46207#46208#0" expanded="false" />
-            <element signature="e#46335#46336#0" expanded="false" />
-            <element signature="e#46366#46367#0" expanded="false" />
-            <element signature="e#46985#46986#0" expanded="false" />
-            <element signature="e#47033#47034#0" expanded="false" />
-            <element signature="e#49296#49297#0" expanded="false" />
-            <element signature="e#49335#49336#0" expanded="false" />
-            <element signature="e#50442#50443#0" expanded="false" />
-            <element signature="e#50481#50482#0" expanded="false" />
-            <element signature="e#51337#51338#0" expanded="false" />
-            <element signature="e#51407#51408#0" expanded="false" />
-            <element signature="e#53486#53487#0" expanded="false" />
-            <element signature="e#53527#53528#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1130,14 +997,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="116" column="95" selection-start-line="116" selection-start-column="95" selection-end-line="116" selection-end-column="95" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/image_compose/grammer.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="57" column="31" selection-start-line="57" selection-start-column="31" selection-end-line="57" selection-end-column="31" />
           <folding />
         </state>
       </provider>
@@ -1169,20 +1028,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="82" column="11" selection-start-line="82" selection-start-column="11" selection-end-line="82" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#9599#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#6408#6409#0" expanded="false" />
-            <element signature="e#6460#6461#0" expanded="false" />
-            <element signature="e#6646#6647#0" expanded="false" />
-            <element signature="e#6675#6676#0" expanded="false" />
-            <element signature="e#6943#6944#0" expanded="false" />
-            <element signature="e#6995#6996#0" expanded="false" />
-            <element signature="e#7181#7182#0" expanded="false" />
-            <element signature="e#7210#7211#0" expanded="false" />
-            <element signature="e#7495#7496#0" expanded="false" />
-            <element signature="e#7524#7525#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1195,30 +1041,40 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33278957">
           <caret line="695" column="33" selection-start-line="695" selection-start-column="32" selection-end-line="695" selection-end-column="33" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_66/src.zip!/java/awt/Graphics2D.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-13.275862">
+        <state vertical-scroll-proportion="0.0">
           <caret line="789" column="27" selection-start-line="789" selection-start-column="27" selection-end-line="789" selection-end-column="27" />
-          <folding />
+          <folding>
+            <element signature="e#0#54934#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_66/src.zip!/java/awt/Graphics.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-14.068966">
+        <state vertical-scroll-proportion="0.0">
           <caret line="113" column="16" selection-start-line="113" selection-start-column="13" selection-end-line="113" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="68" column="19" selection-start-line="68" selection-start-column="19" selection-end-line="68" selection-end-column="19" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/image_compose/core.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.25922954">
-          <caret line="361" column="67" selection-start-line="361" selection-start-column="67" selection-end-line="361" selection-end-column="67" />
+        <state vertical-scroll-proportion="0.110929854">
+          <caret line="8" column="47" selection-start-line="8" selection-start-column="47" selection-end-line="8" selection-end-column="47" />
           <folding />
         </state>
       </provider>

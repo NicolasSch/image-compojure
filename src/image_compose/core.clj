@@ -6,8 +6,7 @@
            (javax.swing JFrame)
            (java.awt.geom AffineTransform Rectangle2D$Double)
            (javax.imageio ImageIO)
-           (java.io File ByteArrayOutputStream)
-           (javafx.geometry Rectangle2D)))
+           (java.io File ByteArrayOutputStream)))
 
 
 (declare set-background rectangle set-shape-settings reset-shape-settings)
@@ -79,7 +78,8 @@
 
 (def ^:dynamic default-image (BufferedImage. 1920 1080 BufferedImage/TYPE_INT_ARGB))
 (def ^:dynamic default-g2d (.createGraphics default-image))
-(def ^:dynamic default-shape-values {:width       1.0
+(def ^:dynamic default-shape-values {
+                                     :width       1.0
                                      :join        :miter
                                      :miter-limit 10.0
                                      :cap         :square
@@ -87,7 +87,7 @@
                                      :dash-phase  0
                                      :composite   :src_over
                                      :alpha       1.0
-                                     :paint       '(color :black)
+                                     :paint       (color :black)
                                      :xor-mode    nil
                                      })
 
@@ -538,7 +538,8 @@
         dimensison (Dimension. (.getWidth image) (.getHeight image))]
     (doto frame
       (.setSize dimensison)
-      (.setVisible true))))
+      (.setVisible true))
+    frame))
 
 (defn repaint [frame]
   "Repaint default-image in displayed JFrame"
