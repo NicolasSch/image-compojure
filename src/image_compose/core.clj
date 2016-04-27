@@ -568,17 +568,21 @@
   )
 
 (defmacro compose
-  [w h settings & body]
+  [w h & forms]
   "May be called with existing BufferedImage or with width and height argument to create a BufferedImage with given size.
    Binds the the new image and its Graphics2D object to default-image and default-g2d."
-  `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)]
-     (binding [default-image image#
-               default-g2d (.createGraphics image#)
-               default-render-settings ~(merge default-render-settings settings)]
-       (set-rendering-hints default-render-settings)
-       (do
-         ~@body
-         default-image))))
+  (loop [settings (first forms)
+         body (next forms)]
+    (if (map? settings)
+      `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)]
+         (binding [default-image image#
+                   default-g2d (.createGraphics image#)
+                   default-render-settings ~(merge default-render-settings settings)]
+           (set-rendering-hints default-render-settings)
+           (do
+             ~@body
+             default-image)))
+      (recur {} forms ))))
 
 (defmacro with-shape-settings
   [settings & body]
