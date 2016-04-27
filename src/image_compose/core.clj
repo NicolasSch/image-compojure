@@ -269,10 +269,11 @@
   Available Textatrributes can be seen in maps: text-weight, text-width, text-posture, text-underline.
   Furthermore fonts can be defiend by the keys: :kerning bool, :swap-colors bool , :foreground Color, :background Color,
   :name String(FontFamilyName), style int"
-  ([text name style size {:keys [weight width underline foreground background strike-through swap-colors kerning]}]
+  ([text name style size {:keys [weight width underline foreground background strike-through swap-colors kerning posture]}]
    (let [font (create-font name style size)
          styled-font (when-> {}
                              kerning (assoc (TextAttribute/KERNING) (TextAttribute/KERNING_ON))
+                             posture (assoc (TextAttribute/POSTURE) (posture text-posture))
                              strike-through (assoc (TextAttribute/STRIKETHROUGH) (TextAttribute/STRIKETHROUGH_ON))
                              swap-colors (assoc (TextAttribute/SWAP_COLORS) (TextAttribute/SWAP_COLORS_ON))
                              width (assoc (TextAttribute/WIDTH) (width text-width))
@@ -297,8 +298,8 @@
   "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
   (RescaleOp. (float-array rgba) (float-array 4) nil))
 
-(defn set-background [color]
-  "Is called on compose macro when background key in settings map is defiend"
+(defn background [color]
+  "Overwrites the whole image with the given color"
   (rectangle 0 0 (.getWidth default-image) (.getHeight default-image) {:fill true :composite :src :paint color}))
 
 (defn set-stroke
@@ -350,7 +351,7 @@
                                 text-antialiasing (assoc (RenderingHints/KEY_TEXT_ANTIALIASING) (text-antialiasing keys-text-antialiasing)))]
     (.setRenderingHints default-g2d rendering-hints)
     (if background
-      (set-background background))))
+      (background background))))
 
 (defn set-shape-settings
   "Sets attributes for stroke, color and composite to default-g2d object."
