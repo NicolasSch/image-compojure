@@ -48,6 +48,7 @@
   "Returns Java.awt.Color object. Can be called with key to get predefiend Java Colors or R G B a values 0-1"
   ([] (. Color Color/white))
   ([key] (cond
+           (= key :white) (. Color Color/WHITE)
            (= key :green) (. Color Color/GREEN)
            (= key :blue) (. Color Color/BLUE)
            (= key :red) (. Color Color/RED)
@@ -87,7 +88,7 @@
                                      :dash-phase  0
                                      :composite   :src_over
                                      :alpha       1.0
-                                     :paint       (color :black)
+                                     :paint       :black
                                      :xor-mode    nil
                                      })
 
@@ -113,7 +114,7 @@
                       :dst_in   (AlphaComposite/DST_IN)
                       :dst_out  (AlphaComposite/DST_OUT)
                       :dst_over (AlphaComposite/DST_OVER)
-                      :src_in   (AlphaComposite/DST_OVER)
+                      :src_in   (AlphaComposite/SRC_IN)
                       :src_out  (AlphaComposite/SRC_OUT)
                       :src_over (AlphaComposite/SRC_OVER)
                       :clear    (AlphaComposite/CLEAR)})
@@ -294,6 +295,15 @@
   ([text]
    (create-styled-text text :dialog :plain 20 {})))
 
+(defn draw-fill [settings fill-func draw-func]
+  (let [fill (:fill settings)
+        settings (dissoc settings :fill)]
+    (println settings)
+    (draw-fill-reset settings
+                     (if fill
+                       (fill-func)
+                       (draw-func)))))
+
 (defn create-scale-op [& rgba]
   "Creates a RescaleOp which can be used to change transparecny of an image when passed to image function"
   (RescaleOp. (float-array rgba) (float-array 4) nil))
@@ -386,6 +396,7 @@
   (set-paint-mode))
 
 
+
 (defn styled-text [x y styled-text]
   "Draws previously created styledtext map to default-g2d object"
   (let [old-font (.getFont default-g2d)]
@@ -415,14 +426,6 @@
    (polyline x y number {})))
 
 
-(defn draw-fill [settings fill-func draw-func]
-  (let [fill (:fill settings)
-        settings (dissoc settings :fill)]
-    (draw-fill-reset settings
-                     (if fill
-                       (fill-func)
-                       (draw-func)))))
-
 (defn rectangle
   "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
@@ -431,7 +434,7 @@
               #(.fillRect default-g2d x y w h)
               #(.drawRect default-g2d x y w h)))
   ([x y w h]
-   (rectangle x y w h {:fill true})))
+   (rectangle x y w h {:fill false})))
 
 
 (defn round-rectangle
@@ -442,7 +445,7 @@
               #(.fillRoundRect default-g2d x y w h arcW arcH)
               #(.drawRoundRect default-g2d x y w h arcW arcH)))
   ([x y w h arcW arcH]
-   (round-rectangle x y w h arcW arcH {:fill true})))
+   (round-rectangle x y w h arcW arcH {:fill false})))
 
 
 (defn oval
@@ -453,7 +456,7 @@
               #(.fillOval default-g2d x y w h)
               #(.drawOval default-g2d x y w h)))
   ([x y w h]
-   (oval x y w h {:fill true})))
+   (oval x y w h {:fill false})))
 
 
 (defn polygon
@@ -467,7 +470,7 @@
               #(.drawPolygon default-g2d (int-array x) (int-array y) (count x))
               #(.fillPolygon default-g2d x y (count x))))
   ([x y]
-   (polygon x y {})))
+   (polygon x y {:fill false})))
 
 
 (defn shapes
@@ -478,7 +481,7 @@
               #(doseq [shape-obj shapes-vec] (.fill default-g2d shape-obj))
               #(doseq [shape-obj shapes-vec] (.draw default-g2d shape-obj))))
   ([shapes-vec]
-   (shapes shapes-vec {:fill true})))
+   (shapes shapes-vec {:fill false})))
 
 
 (defn image
@@ -486,30 +489,30 @@
    Setting will be restored to default-shape-settings
    May also scale image to fit into wanted area.
    Settings attribute :filter takes an ScaleOp Object which can be defined by function create-scaleop"
-  ([img x y]
+  ([x y img]
    (image x y img {}))
 
-  ([img x y settings]
+  ([x y img settings]
    (let [filter (:filter settings)]
      (draw-fill-reset settings
                       (if filter
                         (.drawImage default-g2d img filter x y)
                         (.drawImage default-g2d img x y nil)))))
 
-  ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src]
-   (image img x1dest y1dest x2dest y2dest x1src y1src x2src y2src {} default-g2d))
+  ([x1dest y1dest x2dest y2dest x1src y1src x2src y2src img]
+   (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img {} default-g2d))
 
-  ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings]
-   (image img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings default-g2d))
+  ([x1dest y1dest x2dest y2dest x1src y1src x2src y2src img settings]
+   (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img settings default-g2d))
 
-  ([img x1dest y1dest x2dest y2dest x1src y1src x2src y2src settings g2d]
+  ([x1dest y1dest x2dest y2dest x1src y1src x2src y2src img settings g2d]
    (draw-fill-reset settings
                     (.drawImage g2d img x1dest y1dest x2dest y2dest x1src y1src x2src y2src nil))))
 
 (defn resize
   [img-to-scale w h]
   (let [new-img (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
-    (image img-to-scale 0 0 w h 0 0 (.getWidth img-to-scale) (.getHeight img-to-scale) {} (.createGraphics new-img))
+    (image 0 0 w h 0 0 (.getWidth img-to-scale) (.getHeight img-to-scale) img-to-scale {} (.createGraphics new-img))
     new-img))
 
 (defn crop [])

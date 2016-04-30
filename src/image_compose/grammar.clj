@@ -66,9 +66,16 @@
                                                                                                                 :composite :source
                                                                                                                 :fill      true})))
       (image-compojure/image 0 0 (image-compojure/load-image "src/test.png"))
+
+      (image-compojure/with-shape-settings {:paint :bacl}
+                                           (image-compojure/oval 0 0 500 500 {:paint :blue :fill true})
+                                           (image-compojure/oval 0 0 500 500))
+
       (image-compojure/shapes [(Rectangle2D$Double. 0 0 100 100)
                                (Polygon. (int-array [150 250 325 375 450 275 100])
-                                         (int-array [150 100 125 225 250 375 300]) 7)])
+                                         (int-array [150 100 125 225 250 375 300]) 7)]
+                              {:fill  true
+                               :paint :yellow})
       )
     ))
 
@@ -87,10 +94,9 @@
                                           (range 100 106))))))))
 
 (defn image-example []
-  (let [image (image-compojure/load-image "src/test.png")]
-    (image-compojure/image image 0 0)
-    (image-compojure/image image 0 0 500 500 0 0 500 500)
-    (image-compojure/image (image-compojure/resize image 500 500) 0 0)
+  (let [image (image-compojure/load-image "res/test.png")]
+   (image-compojure/image 0 0 image )
+    (image-compojure/image 0 0 (/(.getWidth image) 2) (/(.getHeight image) 2) 0 0 (.getWidth image)(.getHeight image) image )
     ))
 
 
@@ -110,25 +116,33 @@
 (defn text-example []
   (image-compojure/background :black)
   (image-compojure/styled-text 50 200 (image-compojure/create-styled-text
-                                         "IMAGE-COMPOJURE"
-                                         :times :bold 50 {:foreground (image-compojure/color :yellow )
-                                                          :background (image-compojure/color :red)
-                                                          :kerning false
-                                                          :strikethrough false
-                                                          :swap-colors false
-                                                          :underline :low-on-pixel
-                                                          :weight :weight-demibold
-                                                          :width :width-condensed
-                                                               })))
+                                        "IMAGE-COMPOJURE"
+                                        :times :bold 50 {:foreground    (image-compojure/color :yellow)
+                                                         :background    (image-compojure/color :red)
+                                                         :kerning       false
+                                                         :strikethrough false
+                                                         :swap-colors   false
+                                                         :underline     :low-on-pixel
+                                                         :weight        :weight-demibold
+                                                         :width         :width-condensed
+                                                         })))
 
 (defn render-example [image shape-obj]
   (image-compojure/render-output image {:as :file :path "res/output.png" :clipping shape-obj})
   (image-compojure/render-output image {:as :json})
   (image-compojure/render-output image))
 
+(defn with-shape-settings-example []
+  (image-compojure/with-shape-settings {:paint :yellow :width 50}
+                                       (image-compojure/oval 50 50 500 500 {:paint :black :fill true :width 200})
+                                       (image-compojure/oval 50 50 500 500 )))
 
 (defn test-me []
-  (image-compose.core/render-output (image-compose.core/compose 600 600
-                                                                (color-example shapes-vec1 shapes-vec2 shapes-vec3)))
-  (image-compose.core/render-output (image-compose.core/compose 600 600 {:text-antialiasing :on}
-                                                                (text-example))))
+  ;(image-compose.core/render-output (image-compose.core/compose 600 600
+  ;                                                             (color-example shapes-vec1 shapes-vec2 shapes-vec3)))
+  ; (image-compose.core/render-output (image-compose.core/compose 600 600 {:text-antialiasing :on}
+  ;                                                              (text-example)))
+  ;(image-compose.core/render-output (image-compose.core/compose 600 600 {:antialiasing :on}
+  ;                                                             (with-shape-settings-example))))
+  (image-compose.core/render-output (image-compose.core/compose 1000 1000 {:antialiasing :on}
+                                                                (image-example))))
