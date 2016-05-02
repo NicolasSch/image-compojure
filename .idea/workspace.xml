@@ -4,7 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/src/image_compose/core.clj" line="468" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b25ee1-48ea-4f6b-889e-c8ea3f584148" name="Default" comment="">
+    <list default="true" id="95b25ee1-48ea-4f6b-889e-c8ea3f584148" name="Default" comment="added color white to color function">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/replstate.xml" afterPath="$PROJECT_DIR$/.idea/replstate.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/image_compose/core.clj" afterPath="$PROJECT_DIR$/src/image_compose/core.clj" />
@@ -33,8 +33,8 @@
       <file leaf-file-name="core.clj" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/image_compose/core.clj">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5866774">
-              <caret line="64" column="31" selection-start-line="64" selection-start-column="31" selection-end-line="64" selection-end-column="31" />
+            <state vertical-scroll-proportion="0.76805776">
+              <caret line="590" column="25" selection-start-line="590" selection-start-column="25" selection-end-line="590" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -45,7 +45,28 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="1410" column="16" selection-start-line="1410" selection-start-column="16" selection-end-line="1410" selection-end-column="16" />
-              <folding />
+              <folding>
+                <element signature="e#0#146821#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#43856#43857#0" expanded="false" />
+                <element signature="e#43937#43938#0" expanded="false" />
+                <element signature="e#45334#45335#0" expanded="false" />
+                <element signature="e#45360#45361#0" expanded="false" />
+                <element signature="e#45675#45676#0" expanded="false" />
+                <element signature="e#45701#45702#0" expanded="false" />
+                <element signature="e#46018#46019#0" expanded="false" />
+                <element signature="e#46044#46045#0" expanded="false" />
+                <element signature="e#46361#46362#0" expanded="false" />
+                <element signature="e#46387#46388#0" expanded="false" />
+                <element signature="e#46721#46722#0" expanded="false" />
+                <element signature="e#46747#46748#0" expanded="false" />
+                <element signature="e#47081#47082#0" expanded="false" />
+                <element signature="e#47107#47108#0" expanded="false" />
+                <element signature="e#143211#143212#0" expanded="false" />
+                <element signature="e#143265#143266#0" expanded="false" />
+                <element signature="e#144112#144113#0" expanded="false" />
+                <element signature="e#144192#144193#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -64,7 +85,7 @@
         <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="97" column="16" selection-start-line="95" selection-start-column="0" selection-end-line="99" selection-end-column="6" />
+              <caret line="99" column="6" selection-start-line="99" selection-start-column="6" selection-end-line="99" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -141,6 +162,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -321,9 +344,7 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -762,7 +783,13 @@
       <option name="project" value="LOCAL" />
       <updated>1461758609816</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="added color white to color function">
+      <created>1462044423917</created>
+      <option name="number" value="00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1462044423917</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -775,13 +802,13 @@
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3172043" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27240142" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1702509" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16905615" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -829,7 +856,8 @@
     <MESSAGE value="corrected example grammar" />
     <MESSAGE value="use of compose macro now possible without render-settings map" />
     <MESSAGE value="changed background function in core&#10;added grammar test" />
-    <option name="LAST_COMMIT_MESSAGE" value="changed background function in core&#10;added grammar test" />
+    <MESSAGE value="added color white to color function" />
+    <option name="LAST_COMMIT_MESSAGE" value="added color white to color function" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1185,7 +1213,28 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="1410" column="16" selection-start-line="1410" selection-start-column="16" selection-end-line="1410" selection-end-column="16" />
-          <folding />
+          <folding>
+            <element signature="e#0#146821#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#43856#43857#0" expanded="false" />
+            <element signature="e#43937#43938#0" expanded="false" />
+            <element signature="e#45334#45335#0" expanded="false" />
+            <element signature="e#45360#45361#0" expanded="false" />
+            <element signature="e#45675#45676#0" expanded="false" />
+            <element signature="e#45701#45702#0" expanded="false" />
+            <element signature="e#46018#46019#0" expanded="false" />
+            <element signature="e#46044#46045#0" expanded="false" />
+            <element signature="e#46361#46362#0" expanded="false" />
+            <element signature="e#46387#46388#0" expanded="false" />
+            <element signature="e#46721#46722#0" expanded="false" />
+            <element signature="e#46747#46748#0" expanded="false" />
+            <element signature="e#47081#47082#0" expanded="false" />
+            <element signature="e#47107#47108#0" expanded="false" />
+            <element signature="e#143211#143212#0" expanded="false" />
+            <element signature="e#143265#143266#0" expanded="false" />
+            <element signature="e#144112#144113#0" expanded="false" />
+            <element signature="e#144192#144193#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1193,22 +1242,21 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33306772">
           <caret line="1062" column="28" selection-start-line="1062" selection-start-column="28" selection-end-line="1062" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/image_compose/grammar.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="97" column="16" selection-start-line="95" selection-start-column="0" selection-end-line="99" selection-end-column="6" />
+          <caret line="99" column="6" selection-start-line="99" selection-start-column="6" selection-end-line="99" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/image_compose/core.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5866774">
-          <caret line="64" column="31" selection-start-line="64" selection-start-column="31" selection-end-line="64" selection-end-column="31" />
+        <state vertical-scroll-proportion="0.76805776">
+          <caret line="590" column="25" selection-start-line="590" selection-start-column="25" selection-end-line="590" selection-end-column="25" />
           <folding />
         </state>
       </provider>

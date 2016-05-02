@@ -79,18 +79,18 @@
 
 (def ^:dynamic default-image (BufferedImage. 1920 1080 BufferedImage/TYPE_INT_ARGB))
 (def ^:dynamic default-g2d (.createGraphics default-image))
-(def ^:dynamic default-shape-values {
-                                     :width       1.0
-                                     :join        :miter
-                                     :miter-limit 10.0
-                                     :cap         :square
-                                     :dash        nil
-                                     :dash-phase  0
-                                     :composite   :src_over
-                                     :alpha       1.0
-                                     :paint       :black
-                                     :xor-mode    nil
-                                     })
+(def ^:dynamic default-shape-settings {
+                                       :width       1.0
+                                       :join        :miter
+                                       :miter-limit 10.0
+                                       :cap         :square
+                                       :dash        nil
+                                       :dash-phase  0
+                                       :composite   :src_over
+                                       :alpha       1.0
+                                       :paint       :black
+                                       :xor-mode    nil
+                                       })
 
 (def ^:dynamic default-render-settings {:antialiasing         :off
                                         :aplpha-interpolation :default
@@ -346,7 +346,7 @@
   (let [alpha-composite (. AlphaComposite getInstance (comp composite-rules) alpha)]
     (.setComposite default-g2d alpha-composite)))
 
-(defn set-rendering-hints
+(defn set-render-settings
   "Is called on compose macro to set renderinghints on default-g2d object"
   [{:keys [antialiasing aplpha-interpolation paint dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing background]}]
   (let [rendering-hints (when-> {}
@@ -367,14 +367,14 @@
   "Sets attributes for stroke, color and composite to default-g2d object."
   ([{:keys [width cap join miter-limit dash dash-phase composite alpha paint xor-mode]}]
    (if (or width cap join miter-limit dash dash-phase)
-     (let [width (or width (:width default-shape-values))
-           cap (or cap (:cap default-shape-values))
-           join (or join (:join default-shape-values))
-           miter-limit (or miter-limit (:miter-limit default-shape-values))
+     (let [width (or width (:width default-shape-settings))
+           cap (or cap (:cap default-shape-settings))
+           join (or join (:join default-shape-settings))
+           miter-limit (or miter-limit (:miter-limit default-shape-settings))
            dash (if dash
                   (float-array dash)
-                  (:dash default-shape-values))
-           dash-phase (or dash-phase (:dash-phase default-shape-values))]
+                  (:dash default-shape-settings))
+           dash-phase (or dash-phase (:dash-phase default-shape-settings))]
        (set-stroke width cap join miter-limit dash dash-phase)
        ))
    (if paint
@@ -382,17 +382,17 @@
        (set-paint (color paint))
        (set-paint (eval paint))))
    (if composite
-     (let [alpha (or alpha (:alpha default-shape-values))]
+     (let [alpha (or alpha (:alpha default-shape-settings))]
        (set-composite composite alpha)))
    (if xor-mode
      (set-xor-mode xor-mode))
     )
   ([]
-   (set-shape-settings default-shape-values)))
+   (set-shape-settings default-shape-settings)))
 
-(defn reset-shape-settings []
+(defn reset-shape-settings [settings]
   "Calls on set-shape-settings to reset shape-settings back to defined default-shape-settings"
-  (set-shape-settings)
+  (set-shape-settings settings)
   (set-paint-mode))
 
 
@@ -525,8 +525,8 @@
         format (last (clojure.string/split path #"\."))]
     (ImageIO/write image format file)))
 
-(defn to-json
-  "Converts default-iamge to Base64 JSON"
+(defn to-b64
+  "Converts default-iamge to Base64"
   []
   (let [baos (new ByteArrayOutputStream)]
     (ImageIO/write default-image "jpeg" baos)
@@ -549,7 +549,7 @@
   "Repaint default-image in displayed JFrame"
   (.repaint frame))
 
-(defn render-output
+(defn render
   ":as --> :file; :path PATH = Renders the default-image and stores it as file to the defiend path
   :as --> :show = Renders the default-image and displays it in a JFrame
   :as --> :json = Renders the default-image and converts it to JSON"
@@ -563,12 +563,12 @@
          (show-image image))
        (if (= as :file)
          (save-image image path))
-       (if (= as :json)
-         (to-json)))))
+       (if (= as :b64)
+         (to-b64)))))
   ([image]
-   (render-output image {:as :show}))
+   (render image {:as :show}))
   ([]
-   (render-output default-image))
+   (render default-image))
   )
 
 (defmacro compose
@@ -578,21 +578,24 @@
   (loop [settings (first forms)
          body (next forms)]
     (if (map? settings)
-      `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)]
+      `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)
+             old-render-settings# ~default-render-settings]
          (binding [default-image image#
                    default-g2d (.createGraphics image#)
                    default-render-settings ~(merge default-render-settings settings)]
-           (set-rendering-hints default-render-settings)
+           (set-render-settings default-render-settings)
            (do
              ~@body
+             (set-render-settings old-render-settings#)
              default-image)))
-      (recur {} forms ))))
+      (recur {} forms))))
 
 (defmacro with-shape-settings
   [settings & body]
   `(do
-     (binding [default-shape-values ~(merge default-shape-values settings)]
-       (do
-         (set-shape-settings)
-         ~@body))
-     (reset-shape-settings)))
+     (let [old-shape-settings# ~default-shape-settings]
+       (binding [default-shape-settings ~(merge default-shape-settings settings)]
+         (do
+           (set-shape-settings)
+           ~@body))
+       (reset-shape-settings old-shape-settings#))))

@@ -81,22 +81,22 @@
 
 ;normal code in dsl
 (defn example []
-  (image-compojure/render-output
+  (image-compojure/render
     (image-compojure/compose 800 2000
                              {:antialiasing :on}
                              (image-compojure/with-shape-settings
                                {:paint :red}
                                (dotimes [n 10]
                                  (doall (map
-                                          #(if (= 0 (mod n 2))
-                                            (image-compojure/line 400 50 (* n %) 1000)
-                                            (image-compojure/line 400 50 (* n %) 1000 {:paint :blue}))
+                                          (fn [val] (if (= 0 (mod n 2))
+                                                      (image-compojure/line 400 50 (* n val) 1000)
+                                                      (image-compojure/line 400 50 (* n val) 1000 {:paint :blue})))
                                           (range 100 106))))))))
 
 (defn image-example []
   (let [image (image-compojure/load-image "res/test.png")]
-   (image-compojure/image 0 0 image )
-    (image-compojure/image 0 0 (/(.getWidth image) 2) (/(.getHeight image) 2) 0 0 (.getWidth image)(.getHeight image) image )
+    (image-compojure/image 0 0 image)
+    (image-compojure/image 0 0 (/ (.getWidth image) 2) (/ (.getHeight image) 2) 0 0 (.getWidth image) (.getHeight image) image)
     ))
 
 
@@ -108,7 +108,7 @@
 (defn color-example [shapes1 shapes2 shapes3]
   (let [colors [(image-compojure/color :black) (image-compojure/color 255 0 0 125) (image-compojure/color 0 0 255)]
         texture (image-compojure/texture-paint (image-compojure/load-image "res/txtr.JPG") 0 0 50 50)
-        gradient-paint (image-compojure/gradient-paint 0 0 (first colors) 100 100 (second colors))]
+        gradient-paint (image-compojure/gradient-paint 200 200 (first colors) 600 600 (second colors) true)]
     (image-compojure/shapes shapes2 {:fill true :paint (first colors)})
     (image-compojure/shapes shapes3 {:fill true :paint gradient-paint})
     (image-compojure/shapes shapes1 {:fill true :paint texture})))
@@ -128,21 +128,21 @@
                                                          })))
 
 (defn render-example [image shape-obj]
-  (image-compojure/render-output image {:as :file :path "res/output.png" :clipping shape-obj})
-  (image-compojure/render-output image {:as :json})
-  (image-compojure/render-output image))
+  (image-compojure/render image {:as :file :path "res/output.png" :clipping shape-obj})
+  (image-compojure/render image {:as :json})
+  (image-compojure/render image))
 
 (defn with-shape-settings-example []
   (image-compojure/with-shape-settings {:paint :yellow :width 50}
                                        (image-compojure/oval 50 50 500 500 {:paint :black :fill true :width 200})
-                                       (image-compojure/oval 50 50 500 500 )))
+                                       (image-compojure/oval 50 50 500 500)))
 
 (defn test-me []
-  ;(image-compose.core/render-output (image-compose.core/compose 600 600
-  ;                                                             (color-example shapes-vec1 shapes-vec2 shapes-vec3)))
-  ; (image-compose.core/render-output (image-compose.core/compose 600 600 {:text-antialiasing :on}
+  (image-compose.core/render (image-compose.core/compose 600 600
+                                                         (color-example shapes-vec1 shapes-vec2 shapes-vec3)))
+  ; (image-compose.core/render (image-compose.core/compose 600 600 {:text-antialiasing :on}
   ;                                                              (text-example)))
-  ;(image-compose.core/render-output (image-compose.core/compose 600 600 {:antialiasing :on}
+  ;(image-compose.core/render (image-compose.core/compose 600 600 {:antialiasing :on}
   ;                                                             (with-shape-settings-example))))
-  (image-compose.core/render-output (image-compose.core/compose 1000 1000 {:antialiasing :on}
-                                                                (image-example))))
+  (image-compose.core/render (image-compose.core/compose 1000 1000 {:antialiasing :on}
+                                                         (image-example))))
