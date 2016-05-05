@@ -1,5 +1,5 @@
 (defproject image-compose "1.0.0"
-  :description "A DSL to use JAVA Graphics2D API in Clojure more easily"
+  :description "A DSL for images composiitng with the JAVA 2D API"
   :url "https://bitbucket.org/NicolasSch/image-compose"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}

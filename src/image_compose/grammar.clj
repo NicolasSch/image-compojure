@@ -35,7 +35,7 @@
      :text-antialiasing    :default
      }
 
-    (image-compojure/with-shape-settings
+    (image-compojure/with-attributes
       {:width       1.0
        :join        :miter
        :miter-limit 10.0
@@ -67,9 +67,9 @@
                                                                                                                 :fill      true})))
       (image-compojure/image 0 0 (image-compojure/load-image "src/test.png"))
 
-      (image-compojure/with-shape-settings {:paint :bacl}
-                                           (image-compojure/oval 0 0 500 500 {:paint :blue :fill true})
-                                           (image-compojure/oval 0 0 500 500))
+      (image-compojure/with-attributes {:paint :bacl}
+                                       (image-compojure/oval 0 0 500 500 {:paint :blue :fill true})
+                                       (image-compojure/oval 0 0 500 500))
 
       (image-compojure/shapes [(Rectangle2D$Double. 0 0 100 100)
                                (Polygon. (int-array [150 250 325 375 450 275 100])
@@ -84,7 +84,7 @@
   (image-compojure/render
     (image-compojure/compose 800 2000
                              {:antialiasing :on}
-                             (image-compojure/with-shape-settings
+                             (image-compojure/with-attributes
                                {:paint :red}
                                (dotimes [n 10]
                                  (doall (map
@@ -132,17 +132,19 @@
   (image-compojure/render image {:as :json})
   (image-compojure/render image))
 
-(defn with-shape-settings-example []
-  (image-compojure/with-shape-settings {:paint :yellow :width 50}
-                                       (image-compojure/oval 50 50 500 500 {:paint :black :fill true :width 200})
-                                       (image-compojure/oval 50 50 500 500)))
+
+
+(defn with-attributes-example []
+  (image-compojure/with-attributes {:paint :yellow :width 50}
+                                   (image-compojure/oval 50 50 500 500 {:paint :black :fill true :width 200})
+                                   (image-compojure/oval 50 50 500 500)))
 
 (defn test-me []
   (image-compose.core/render (image-compose.core/compose 600 600
                                                          (color-example shapes-vec1 shapes-vec2 shapes-vec3)))
-  ; (image-compose.core/render (image-compose.core/compose 600 600 {:text-antialiasing :on}
-  ;                                                              (text-example)))
-  ;(image-compose.core/render (image-compose.core/compose 600 600 {:antialiasing :on}
-  ;                                                             (with-shape-settings-example))))
+   (image-compose.core/render (image-compose.core/compose 600 600 {:text-antialiasing :on}
+                                                                (text-example)))
+  (image-compose.core/render (image-compose.core/compose 600 600 {:antialiasing :on}
+                                                               (with-attributes-example)))
   (image-compose.core/render (image-compose.core/compose 1000 1000 {:antialiasing :on}
                                                          (image-example))))

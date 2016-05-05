@@ -9,18 +9,17 @@
            (java.io File ByteArrayOutputStream)))
 
 
-(declare set-background rectangle set-shape-settings reset-shape-settings)
+(declare set-background rectangle set-shape-attributes reset-shape-attributes)
 
 (defmacro draw-fill-reset
   "Convenience macro not to call set-shape-setting and reset-shape-settings everytime a shape was drawn to default-g2d-object."
-  [settings & body]
-  `(if (not-empty ~settings)
+  [atrributes & body]
+  `(if (not-empty ~atrributes)
      (do
-       (set-shape-settings ~settings)
+       (set-shape-attributes ~atrributes)
        ~@body
-       (reset-shape-settings))
-     (do ~@body))
-  )
+       (reset-shape-attributes))
+     (do ~@body)))
 
 (defmacro when->
   "Similar to -> but checks logical truth of first form. Calls second form on object."
@@ -79,7 +78,7 @@
 
 (def ^:dynamic default-image (BufferedImage. 1920 1080 BufferedImage/TYPE_INT_ARGB))
 (def ^:dynamic default-g2d (.createGraphics default-image))
-(def ^:dynamic default-shape-settings {
+(def ^:dynamic default-shape-attributes {
                                        :width       1.0
                                        :join        :miter
                                        :miter-limit 10.0
@@ -251,8 +250,8 @@
         (.transform default-g2d new-trans#)
         ~@forms
         (set-transform current-trans#))
-      ))
-  )
+      )))
+
 (defn load-image [source]
   "Creates a BufferedImage from a defined source"
   (ImageIO/read (File. source)))
@@ -295,11 +294,10 @@
   ([text]
    (create-styled-text text :dialog :plain 20 {})))
 
-(defn draw-fill [settings fill-func draw-func]
-  (let [fill (:fill settings)
-        settings (dissoc settings :fill)]
-    (println settings)
-    (draw-fill-reset settings
+(defn draw-fill [atrributes fill-func draw-func]
+  (let [fill (:fill atrributes)
+        atrributes (dissoc atrributes :fill)]
+    (draw-fill-reset atrributes
                      (if fill
                        (fill-func)
                        (draw-func)))))
@@ -363,18 +361,18 @@
     (if background
       (background background))))
 
-(defn set-shape-settings
+(defn set-shape-attributes
   "Sets attributes for stroke, color and composite to default-g2d object."
   ([{:keys [width cap join miter-limit dash dash-phase composite alpha paint xor-mode]}]
    (if (or width cap join miter-limit dash dash-phase)
-     (let [width (or width (:width default-shape-settings))
-           cap (or cap (:cap default-shape-settings))
-           join (or join (:join default-shape-settings))
-           miter-limit (or miter-limit (:miter-limit default-shape-settings))
+     (let [width (or width (:width default-shape-attributes))
+           cap (or cap (:cap default-shape-attributes))
+           join (or join (:join default-shape-attributes))
+           miter-limit (or miter-limit (:miter-limit default-shape-attributes))
            dash (if dash
                   (float-array dash)
-                  (:dash default-shape-settings))
-           dash-phase (or dash-phase (:dash-phase default-shape-settings))]
+                  (:dash default-shape-attributes))
+           dash-phase (or dash-phase (:dash-phase default-shape-attributes))]
        (set-stroke width cap join miter-limit dash dash-phase)
        ))
    (if paint
@@ -382,17 +380,17 @@
        (set-paint (color paint))
        (set-paint (eval paint))))
    (if composite
-     (let [alpha (or alpha (:alpha default-shape-settings))]
+     (let [alpha (or alpha (:alpha default-shape-attributes))]
        (set-composite composite alpha)))
    (if xor-mode
      (set-xor-mode xor-mode))
     )
   ([]
-   (set-shape-settings default-shape-settings)))
+   (set-shape-attributes default-shape-attributes)))
 
-(defn reset-shape-settings [settings]
+(defn reset-shape-attributes []
   "Calls on set-shape-settings to reset shape-settings back to defined default-shape-settings"
-  (set-shape-settings settings)
+  (set-shape-attributes)
   (set-paint-mode))
 
 
@@ -408,8 +406,8 @@
 (defn line
   "Draws line to default-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing"
-  ([x1 y1 x2 y2 settings]
-   (draw-fill-reset settings
+  ([x1 y1 x2 y2 attributes]
+   (draw-fill-reset attributes
                     (.drawLine default-g2d x1 y1 x2 y2)
                     ))
   ([x1 y1 x2 y2]
@@ -419,8 +417,8 @@
   "Draws multiple lines to default-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing.
   Takes a sequnce for x and y coordinates a the number of lines"
-  ([x y number settings]
-   (draw-fill-reset settings
+  ([x y number attributes]
+   (draw-fill-reset attributes
                     (.drawPolyline default-g2d x y number)))
   ([x y number]
    (polyline x y number {})))
@@ -429,8 +427,8 @@
 (defn rectangle
   "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
-  ([x y w h settings]
-   (draw-fill settings
+  ([x y w h attributes]
+   (draw-fill attributes
               #(.fillRect default-g2d x y w h)
               #(.drawRect default-g2d x y w h)))
   ([x y w h]
@@ -440,8 +438,8 @@
 (defn round-rectangle
   "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
-  ([x y w h arcW arcH settings]
-   (draw-fill settings
+  ([x y w h arcW arcH attributes]
+   (draw-fill attributes
               #(.fillRoundRect default-g2d x y w h arcW arcH)
               #(.drawRoundRect default-g2d x y w h arcW arcH)))
   ([x y w h arcW arcH]
@@ -451,8 +449,8 @@
 (defn oval
   "Draws an oval to default-g2d-object. May be called with settings map to set shape settings. Settings will be restored to
   default-shape-values after drawing process finished."
-  ([x y w h settings]
-   (draw-fill settings
+  ([x y w h attributes]
+   (draw-fill attributes
               #(.fillOval default-g2d x y w h)
               #(.drawOval default-g2d x y w h)))
   ([x y w h]
@@ -462,13 +460,13 @@
 (defn polygon
   "Draws a polygon to the default-g2d object. May be called with shape settings. Settings will be restored after drawing process.
   Takes sequences of x, y coordinates and number of points the polygon consists of"
-  ([x y settings]
+  ([x y attributes]
    (if-not (= (count x) (count y))
      (throw (RuntimeException.
               "Number of x and y coordinates must be equal")))
-   (draw-fill settings
-              #(.drawPolygon default-g2d (int-array x) (int-array y) (count x))
-              #(.fillPolygon default-g2d x y (count x))))
+   (draw-fill attributes
+              #(.fillPolygon default-g2d x y (count x))
+              #(.drawPolygon default-g2d (int-array x) (int-array y) (count x))))
   ([x y]
    (polygon x y {:fill false})))
 
@@ -476,8 +474,8 @@
 (defn shapes
   "Draws shape object to default-g2d object. Can be called with shape settings map to overide defualt-shape-settings.
   Shape settings will be restored when passed to function."
-  ([shapes-vec settings]
-   (draw-fill settings
+  ([shapes-vec attributes]
+   (draw-fill attributes
               #(doseq [shape-obj shapes-vec] (.fill default-g2d shape-obj))
               #(doseq [shape-obj shapes-vec] (.draw default-g2d shape-obj))))
   ([shapes-vec]
@@ -492,9 +490,9 @@
   ([x y img]
    (image x y img {}))
 
-  ([x y img settings]
-   (let [filter (:filter settings)]
-     (draw-fill-reset settings
+  ([x y img attributes]
+   (let [filter (:filter attributes)]
+     (draw-fill-reset attributes
                       (if filter
                         (.drawImage default-g2d img filter x y)
                         (.drawImage default-g2d img x y nil)))))
@@ -502,11 +500,11 @@
   ([x1dest y1dest x2dest y2dest x1src y1src x2src y2src img]
    (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img {} default-g2d))
 
-  ([x1dest y1dest x2dest y2dest x1src y1src x2src y2src img settings]
-   (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img settings default-g2d))
+  ([x1dest y1dest x2dest y2dest x1src y1src x2src y2src img attributes]
+   (image x1dest y1dest x2dest y2dest x1src y1src x2src y2src img attributes default-g2d))
 
-  ([x1dest y1dest x2dest y2dest x1src y1src x2src y2src img settings g2d]
-   (draw-fill-reset settings
+  ([x1dest y1dest x2dest y2dest x1src y1src x2src y2src img attributes g2d]
+   (draw-fill-reset attributes
                     (.drawImage g2d img x1dest y1dest x2dest y2dest x1src y1src x2src y2src nil))))
 
 (defn resize
@@ -571,6 +569,7 @@
    (render default-image))
   )
 
+
 (defmacro compose
   [w h & forms]
   "May be called with existing BufferedImage or with width and height argument to create a BufferedImage with given size.
@@ -578,24 +577,21 @@
   (loop [settings (first forms)
          body (next forms)]
     (if (map? settings)
-      `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)
-             old-render-settings# ~default-render-settings]
+      `(let [image# (BufferedImage. ~w ~h BufferedImage/TYPE_INT_ARGB)]
          (binding [default-image image#
                    default-g2d (.createGraphics image#)
                    default-render-settings ~(merge default-render-settings settings)]
            (set-render-settings default-render-settings)
            (do
              ~@body
-             (set-render-settings old-render-settings#)
              default-image)))
       (recur {} forms))))
 
-(defmacro with-shape-settings
-  [settings & body]
+(defmacro with-attributes
+  [attributes & body]
   `(do
-     (let [old-shape-settings# ~default-shape-settings]
-       (binding [default-shape-settings ~(merge default-shape-settings settings)]
+     (binding [default-shape-attributes ~(merge default-shape-attributes attributes)]
          (do
-           (set-shape-settings)
+           (set-shape-attributes)
            ~@body))
-       (reset-shape-settings old-shape-settings#))))
+     (reset-shape-attributes)))
