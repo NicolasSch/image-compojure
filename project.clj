@@ -1,4 +1,4 @@
-(defproject image-compose "1.0.0"
+(defproject image-compojure "1.0.0"
   :description "A DSL for images composiitng with the JAVA 2D API"
   :url "https://bitbucket.org/NicolasSch/image-compose"
   :license {:name "Eclipse Public License"

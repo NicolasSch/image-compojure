@@ -1,5 +1,5 @@
-(ns image-compose.grammar
-  (:require [image-compose.core :as image-compojure])
+(ns image-compojure.grammar
+  (:require [image-compojure.core :as image-compojure])
   (:import (java.awt.geom RoundRectangle2D RoundRectangle2D$Double Rectangle2D$Double)
            (java.awt Polygon Color)))
 
@@ -140,11 +140,11 @@
                                    (image-compojure/oval 50 50 500 500)))
 
 (defn test-me []
-  (image-compose.core/render (image-compose.core/compose 600 600
+  (image-compojure/render (image-compojure/compose 600 600
                                                          (color-example shapes-vec1 shapes-vec2 shapes-vec3)))
-   (image-compose.core/render (image-compose.core/compose 600 600 {:text-antialiasing :on}
+   (image-compojure/render (image-compojure/compose 600 600 {:text-antialiasing :on}
                                                                 (text-example)))
-  (image-compose.core/render (image-compose.core/compose 600 600 {:antialiasing :on}
+  (image-compojure/render (image-compojure/compose 600 600 {:antialiasing :on}
                                                                (with-attributes-example)))
-  (image-compose.core/render (image-compose.core/compose 1000 1000 {:antialiasing :on}
+  (image-compojure/render (image-compojure/compose 1000 1000 {:antialiasing :on}
                                                          (image-example))))

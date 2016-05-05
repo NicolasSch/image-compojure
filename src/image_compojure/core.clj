@@ -1,4 +1,4 @@
-(ns image-compose.core
+(ns image-compojure.core
   (:require [clojure.data.codec.base64 :as b64])
   (:import (java.awt Color Font Graphics Graphics2D Dimension BasicStroke RenderingHints AlphaComposite GradientPaint TexturePaint)
            (java.awt.font TextAttribute)
@@ -12,7 +12,7 @@
 (declare set-background rectangle set-shape-attributes reset-shape-attributes)
 
 (defmacro draw-fill-reset
-  "Convenience macro not to call set-shape-setting and reset-shape-settings everytime a shape was drawn to default-g2d-object."
+  "Convenience macro not to call set-shape-attributes and reset-shape-settings everytime a shape was drawn to default-g2d-object."
   [atrributes & body]
   `(if (not-empty ~atrributes)
      (do
@@ -44,7 +44,7 @@
 
 
 (defn color
-  "Returns Java.awt.Color object. Can be called with key to get predefiend Java Colors or R G B a values 0-1"
+  "Returns Java.awt.Color object. Can be called with key to get predefiend Java Colors or R G B a values 1-255"
   ([] (. Color Color/white))
   ([key] (cond
            (= key :white) (. Color Color/WHITE)
@@ -64,12 +64,15 @@
   ([r g b a] (Color. r g b a)))
 
 (defn gradient-paint
+  "Create a Gradientpaint from starting to endpoint with the given colors"
   ([x1 y1 color1 x2 y2 color2 cyclic]
    (GradientPaint. x1 y1 color1 x2 y2 color2 cyclic))
   ([x1 y1 color1 x2 y2 color2]
    (GradientPaint. x1 y1 color1 x2 y2 color2)))
 
 (defn texture-paint
+  "Takes an image and coordinates which specify a rectangle. Returns a texture with size tof the
+  rectangle containing the image"
   [txtr anchor-x1 anchor-y1 anchor-x2 anchor-y2]
   (let [rec (Rectangle2D$Double. anchor-x1 anchor-y1 anchor-x2 anchor-y2)]
     (TexturePaint. txtr rec)
@@ -205,23 +208,28 @@
                              :lcd-vgbr (RenderingHints/VALUE_TEXT_ANTIALIAS_LCD_VBGR)})
 
 (defn set-transform
+  "Overrides the current transform of default-g2d with a new transfomration"
   [trans]
   (.setTransform default-g2d trans))
 
 (defn concat-transforms
   ([at new-at]
+   "Concates and two AffineTransform Objekts and returns the Transformation"
    (.concatenate at new-at)
    at))
 
 (defn translate
+  "Performs a translate transformation with given arguments x and y on Affinetransform at and returns it"
   ([at x y]
    (.translate at x y) at))
 
 (defn shear
+  "Performs a shear transformation with given arguments x and y on Affinetransform at and returns it"
   ([at shx shy]
    (.shear at shx shy) at))
 
 (defn rotate
+  "Performs a rotate transformation with given arguments on Affinetransform at and returns it"
   ([at theta]
    (.rotate at theta) at)
   ([at vecx vecy]
@@ -232,17 +240,19 @@
    (.rotate at vecx vecy anchorx anchory) at))
 
 (defn scale
+  "Performs a scale transformation with given arguments x and y on Affinetransform at"
   [at scalex scaley]
   (.scale at scalex scaley) at)
 
 (defmacro transform
+  "Creates a new Affinetransform Object and calls any number of transformation on it. Returns the new Object at"
   ([& forms]
    `(let [at# (AffineTransform.)]
       (-> at#
           ~@forms))))
 
 (defmacro with-transform
-  ""
+  "Concates a given AffineTransform Object with the current transformation of the default-g2d object"
   ([trans & forms]
    `(let [current-trans# (.getTransform default-g2d)
           new-trans# (concat-transforms (.getTransform default-g2d) ~trans)]
@@ -257,7 +267,7 @@
   (ImageIO/read (File. source)))
 
 (defn create-font
-  "Returns a logical Font which can be used on any Java platform. Font must be defiend in fonts map"
+  "Returns a logical font which can be used on any Java platform. Font must be defiend in map fonts"
   ([name style size]
    (Font. (name fonts) (style font-styles) size)
     ))
@@ -266,7 +276,7 @@
   "Creates a map containing the text which shall be drawn to the default-g2d object as String and a font defined by
   FontfamilyName, Style, Size and Textattributes
   For available FontFamilys and styles see defiend maps 'fonts' and 'font-styles'
-  Available Textatrributes can be seen in maps: text-weight, text-width, text-posture, text-underline.
+  Available Textatrributes can be looked up in maps: text-weight, text-width, text-posture, text-underline.
   Furthermore fonts can be defiend by the keys: :kerning bool, :swap-colors bool , :foreground Color, :background Color,
   :name String(FontFamilyName), style int"
   ([text name style size {:keys [weight width underline foreground background strike-through swap-colors kerning posture]}]
@@ -295,6 +305,7 @@
    (create-styled-text text :dialog :plain 20 {})))
 
 (defn draw-fill [atrributes fill-func draw-func]
+  "Takes attributes as mpa and two function  which will be passed to draw-fill-reset macro"
   (let [fill (:fill atrributes)
         atrributes (dissoc atrributes :fill)]
     (draw-fill-reset atrributes
@@ -317,11 +328,13 @@
     (.setStroke default-g2d stroke)))
 
 (defn set-xor-mode [paint]
+  "Sets xor mode of default-g2d"
   (if (keyword? paint)
     (.setXORMode default-g2d (color paint))
     (.setXORMode default-g2d paint)))
 
 (defn set-paint-mode []
+  "Disables xor-mode of default-g2d"
   (.setPaintMode default-g2d))
 
 
@@ -345,7 +358,7 @@
     (.setComposite default-g2d alpha-composite)))
 
 (defn set-render-settings
-  "Is called on compose macro to set renderinghints on default-g2d object"
+  "Is called on compose macro to set rendering hints on default-g2d object"
   [{:keys [antialiasing aplpha-interpolation paint dithering fractional-metrics interpolatioin rendering stroke-control text-antialiasing background]}]
   (let [rendering-hints (when-> {}
                                 antialiasing (assoc (RenderingHints/KEY_ANTIALIASING) (antialiasing keys-antialiasing))
@@ -362,7 +375,7 @@
       (background background))))
 
 (defn set-shape-attributes
-  "Sets attributes for stroke, color and composite to default-g2d object."
+  "Sets attributes for stroke, color, composite and xor-mode to default-g2d object."
   ([{:keys [width cap join miter-limit dash dash-phase composite alpha paint xor-mode]}]
    (if (or width cap join miter-limit dash dash-phase)
      (let [width (or width (:width default-shape-attributes))
@@ -389,7 +402,7 @@
    (set-shape-attributes default-shape-attributes)))
 
 (defn reset-shape-attributes []
-  "Calls on set-shape-settings to reset shape-settings back to defined default-shape-settings"
+  "Calls on set-shape-attributes to reset shape-attributes back to defined default-shape-attributes"
   (set-shape-attributes)
   (set-paint-mode))
 
@@ -404,8 +417,8 @@
     ))
 
 (defn line
-  "Draws line to default-g2d object. May be called with settings map to set shape settings. Settings will be restored to
-  default-shape-values after drawing"
+  "Draws line to default-g2d object. May be called with attributes map to set shape attributes.
+   Attributes will be restored to default-shape-attributes after drawing porcess is finished"
   ([x1 y1 x2 y2 attributes]
    (draw-fill-reset attributes
                     (.drawLine default-g2d x1 y1 x2 y2)
@@ -414,9 +427,9 @@
    (line x1 y1 x2 y2 {})))
 
 (defn polyline
-  "Draws multiple lines to default-g2d object. May be called with settings map to set shape settings. Settings will be restored to
-  default-shape-values after drawing.
-  Takes a sequnce for x and y coordinates a the number of lines"
+  "Draws multiple lines to default-g2d object. May be called with attributes map to set shape attributes.
+   Attributes will be restored to default-shape-attributes after drawing.
+   Takes a sequnce for x and y coordinates a the number of lines"
   ([x y number attributes]
    (draw-fill-reset attributes
                     (.drawPolyline default-g2d x y number)))
@@ -425,8 +438,8 @@
 
 
 (defn rectangle
-  "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
-  default-shape-values after drawing process finished."
+  "Draws a rectangle to defaul-g2d object. May be called with attributes map to set shape attributes.
+   Attributes will be restored to default-shape-attributes after drawing process is finished."
   ([x y w h attributes]
    (draw-fill attributes
               #(.fillRect default-g2d x y w h)
@@ -436,8 +449,8 @@
 
 
 (defn round-rectangle
-  "Draws a rectangle to defaul-g2d object. May be called with settings map to set shape settings. Settings will be restored to
-  default-shape-values after drawing process finished."
+  "Draws a rectangle to defaul-g2d object. May be called with attributes map to set shape attributes.
+   Attributes will be restored to default-shape-attributes after drawing process is finished."
   ([x y w h arcW arcH attributes]
    (draw-fill attributes
               #(.fillRoundRect default-g2d x y w h arcW arcH)
@@ -447,8 +460,8 @@
 
 
 (defn oval
-  "Draws an oval to default-g2d-object. May be called with settings map to set shape settings. Settings will be restored to
-  default-shape-values after drawing process finished."
+  "Draws an oval to default-g2d-object. May be called with attributes map to set shape attributes.
+   Attributes will be restored to default-shape-attributes after drawing process is finished."
   ([x y w h attributes]
    (draw-fill attributes
               #(.fillOval default-g2d x y w h)
@@ -458,8 +471,9 @@
 
 
 (defn polygon
-  "Draws a polygon to the default-g2d object. May be called with shape settings. Settings will be restored after drawing process.
-  Takes sequences of x, y coordinates and number of points the polygon consists of"
+  "Draws a polygon to the default-g2d object. May be called with shape attributes.
+   Attributes will be restored after drawing process.
+   Takes sequences of x, y coordinates and number of points the polygon consists of"
   ([x y attributes]
    (if-not (= (count x) (count y))
      (throw (RuntimeException.
@@ -472,8 +486,9 @@
 
 
 (defn shapes
-  "Draws shape object to default-g2d object. Can be called with shape settings map to overide defualt-shape-settings.
-  Shape settings will be restored when passed to function."
+  "Draws shape objects defined in a sequence such as vectors or lists to default-g2d object.
+   Can be called with shape attributes map to overide defualt-shape-attributes.
+   Shape attributes will be restored when passed to function."
   ([shapes-vec attributes]
    (draw-fill attributes
               #(doseq [shape-obj shapes-vec] (.fill default-g2d shape-obj))
@@ -483,10 +498,10 @@
 
 
 (defn image
-  "Draws a BufferedImage into default-image. Can be called with a settings map to define composite attribute.
-   Setting will be restored to default-shape-settings
+  "Draws a BufferedImage into default-image. Can be called with a attributes map to define composite attribute.
+   attributes will be restored to default-shape-attributes
    May also scale image to fit into wanted area.
-   Settings attribute :filter takes an ScaleOp Object which can be defined by function create-scaleop"
+   attributes attribute :filter takes an ScaleOp Object which can be defined by function create-scaleop"
   ([x y img]
    (image x y img {}))
 
@@ -508,6 +523,7 @@
                     (.drawImage g2d img x1dest y1dest x2dest y2dest x1src y1src x2src y2src nil))))
 
 (defn resize
+  "Takes an image and resizes it to given size. Returns the new image"
   [img-to-scale w h]
   (let [new-img (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
     (image 0 0 w h 0 0 (.getWidth img-to-scale) (.getHeight img-to-scale) img-to-scale {} (.createGraphics new-img))
@@ -572,8 +588,9 @@
 
 (defmacro compose
   [w h & forms]
-  "May be called with existing BufferedImage or with width and height argument to create a BufferedImage with given size.
-   Binds the the new image and its Graphics2D object to default-image and default-g2d."
+  "Create a new BufferedImage of dimension of w width and h height .
+   Binds the the new image and its Graphics2D object to default-image and default-g2d. Also bind default-render-settings
+   and sets them onto default-g2d object"
   (loop [settings (first forms)
          body (next forms)]
     (if (map? settings)
@@ -588,6 +605,8 @@
       (recur {} forms))))
 
 (defmacro with-attributes
+  "Binds new values to default-shape-attributes. Every shape object will be drawn to default-g2d with the new defined values.
+  Restores old attributes when leaving the macros kontexts"
   [attributes & body]
   `(do
      (binding [default-shape-attributes ~(merge default-shape-attributes attributes)]
